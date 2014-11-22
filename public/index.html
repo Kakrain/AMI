@@ -1,6 +1,3 @@
-<!--BUGS:
-no funciona con un js independiente
--->
 <html>
 	<head>
 		<title>BodyMatico.js app</title>
@@ -29,6 +26,7 @@ no funciona con un js independiente
 		<script src="interfaz.js"></script>
 		<script src="Raycaster.js"></script>
 		<script src="Clock.js"></script>
+		<script src="AmbienteMatico.js"></script>
 		<script>
 		 	var pausa=false;
 			var theta=0.0;
@@ -52,42 +50,20 @@ var interface1=new Interfaz (camera,scene);
 THREE.ImageUtils.crossOrigin = "anonymous";
 
 
+	var ambiente=new ambienteMatico(scene);
+//placas tectonicas
+	ambiente.addPlaca('map/dirt-512.jpg',40,10);//url de la textura, peso con respecto a la altura, numero de veces que se repite esta
+	ambiente.addPlaca('map/sand-512.jpg',7.7,10);
+	ambiente.addPlaca('map/grass-512.jpg',12.3,10);
+	ambiente.addPlaca('map/rock-512.jpg',16.9,10);
+	ambiente.addPlaca('map/snow-512.jpg',23,10);
 
-
-
-			var materialArray = [];
- materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'skybox/CementaryFT.jpg' ) }));
-    materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'skybox/CementaryBK.jpg' ) }));
-
-    materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'skybox/CementaryUP.jpg' ) }));
-    materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'skybox/CementaryDN.jpg' ) }));
-
-    materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'skybox/CementaryRT.jpg' ) }));
-materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'skybox/CementaryLT.jpg' ) }));
-    
-for (var i = 0; i < 6; i++){materialArray[i].side = THREE.BackSide;}
-    var skyboxGeom = new THREE.BoxGeometry( 1000, 1000, 1000, 1, 1, 1);//era 1000
-    var skybox = new THREE.Mesh( skyboxGeom, new THREE.MeshFaceMaterial(materialArray));
-    scene.add(skybox);
-
-
-
-			
-			/*
-			var texturePiso = THREE.ImageUtils.loadTexture('../chess.jpg');
-			texturePiso.wrapS = texturePiso.wrapT = THREE.RepeatWrapping;			
-			texturePiso.repeat.set( 80, 80 );
-			geometry = new THREE.PlaneBufferGeometry( 1000, 1000, 1, 1 );
-			material  = new THREE.MeshPhongMaterial( {combine: THREE.MixOperation, map:texturePiso, ambient: 0xffffff, specular: 0x050505 } );
-			material.side = THREE.DoubleSide;
-//var floor = new THREE.Mesh( geometry, material );
- var floor= getTerreno(THREE.ImageUtils.loadTexture('heightmap/map1.bmp'),material,1000,1000);
-floor.rotation.x = Math.PI/2;
-			floor.receiveShadow = true;
-			scene.add( floor );
-*/
-			
-	getTerreno();		
+ambiente.setDifuminado(0.1);//default es 0.02
+	ambiente.setHeightMap("map/heightmap.png");
+	
+	ambiente.setSkybox("dawn");//era Cementary
+	ambiente.setMar("map/water512.jpg");
+	ambiente.generate();	
 
 
 var weapon=new Arma(30,2,1);
@@ -105,9 +81,6 @@ var cil= new THREE.Mesh( new THREE.CylinderGeometry( 0.1, 0.5,1.7 ), new THREE.M
 			scene.add(cil);
 var ally=new SerVivo (cil,scene,enemies,allies);
 ally.addArma(weapon.clone());
-
-//enemy.setDestino(new THREE.Vector3(-10,-10,-10));
-
 
 var hemiLight,dirLight,light;
 
@@ -187,8 +160,6 @@ this.clone=function(){
 	return new Arma(damage,range,rate);
 }
 }
-
-
 function SerVivo (o,scene,_enemies,_allies) {
 	var tiempoPutrefaccion=2;
    var range=80;
@@ -210,7 +181,7 @@ function SerVivo (o,scene,_enemies,_allies) {
    vector.applyQuaternion(object.quaternion );
    var vision=new THREE.Raycaster(object.position, vector, 1, range);
    var dead=null;
-   allies.splice(1,0,this);
+   allies.splice(1,0,this);//añade
 //dibujarLinea(object.position, object.position.clone().add(vector.multiplyScalar(range)),"green");
 this.addArma=function(arm){
  arma=arm;
@@ -224,7 +195,7 @@ this.podrirse=function(dt){
 	if(dead[1].material.opacity<=0){
 		scene.remove(dead[0]);
 		scene.remove(dead[1]);
-		allies.splice(allies.indexOf(this),1);
+		allies.splice(allies.indexOf(this),1);//elimina
 	}
 }
 this.setHealth=function(h){
@@ -329,160 +300,6 @@ return true;//no pasa
 }
 }
 }
-function getTerreno(img,material,width,height){
-// texture used to generate "bumpiness"
-	var bumpTexture = new THREE.ImageUtils.loadTexture( 'map/heightmap.png' );
-	bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
-	// magnitude of normal displacement
-	var bumpScale   = 200.0;
-	
-	var oceanTexture = new THREE.ImageUtils.loadTexture( 'map/dirt-512.jpg' );
-	oceanTexture.wrapS = oceanTexture.wrapT = THREE.RepeatWrapping; 
-	
-	var sandyTexture = new THREE.ImageUtils.loadTexture( 'map/sand-512.jpg' );
-	sandyTexture.wrapS = sandyTexture.wrapT = THREE.RepeatWrapping; 
-	
-	var grassTexture = new THREE.ImageUtils.loadTexture( 'map/grass-512.jpg' );
-	grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping; 
-	
-	var rockyTexture = new THREE.ImageUtils.loadTexture( 'map/rock-512.jpg' );
-	rockyTexture.wrapS = rockyTexture.wrapT = THREE.RepeatWrapping; 
-	
-	var snowyTexture = new THREE.ImageUtils.loadTexture( 'map/snow-512.jpg' );
-	snowyTexture.wrapS = snowyTexture.wrapT = THREE.RepeatWrapping;
-
-var customUniforms = {
-		bumpTexture:	{ type: "t", value: bumpTexture },
-		bumpScale:	    { type: "f", value: bumpScale },
-		oceanTexture:	{ type: "t", value: oceanTexture },
-		sandyTexture:	{ type: "t", value: sandyTexture },
-		grassTexture:	{ type: "t", value: grassTexture },
-		rockyTexture:	{ type: "t", value: rockyTexture },
-		snowyTexture:	{ type: "t", value: snowyTexture },
-	};
-var customMaterial = new THREE.ShaderMaterial( 
-	{
-	    uniforms: customUniforms,
-		vertexShader:  
-		"uniform sampler2D bumpTexture;"+
-		"uniform float bumpScale;"+
-		"varying float vAmount;"+
-		"varying vec2 vUV;"+
-		"void main(){"+
-		"	vUV = uv;"+
-		"	vec4 bumpData = texture2D( bumpTexture, uv );"+
-		"    vAmount = bumpData.r;"+
-		"    vec3 newPosition = position + normal * bumpScale * vAmount;"+
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );}",
-		//document.getElementById( 'fragmentShader' ).textContent,
-		fragmentShader: 
-		"uniform sampler2D oceanTexture;\n"+
-		"uniform sampler2D sandyTexture;\n"+
-		"uniform sampler2D grassTexture;\n"+
-		"uniform sampler2D rockyTexture;\n"+
-		"uniform sampler2D snowyTexture;\n"+
-		"varying vec2 vUV;\n"+
-		"varying float vAmount;\n"+
-		"void main(){\n"+ 
-			"vec4 water = (smoothstep(0.01, 0.25, vAmount) - smoothstep(0.24, 0.26, vAmount)) * texture2D( oceanTexture, vUV * 10.0 );\n"+
-			"vec4 sandy = (smoothstep(0.24, 0.27, vAmount) - smoothstep(0.28, 0.31, vAmount)) * texture2D( sandyTexture, vUV * 10.0 );\n"+
-			"vec4 grass = (smoothstep(0.28, 0.32, vAmount) - smoothstep(0.35, 0.40, vAmount)) * texture2D( grassTexture, vUV * 20.0 );\n"+
-			"vec4 rocky = (smoothstep(0.30, 0.50, vAmount) - smoothstep(0.40, 0.70, vAmount)) * texture2D( rockyTexture, vUV * 20.0 );\n"+
-			"vec4 snowy = (smoothstep(0.50, 0.65, vAmount))*texture2D( snowyTexture, vUV * 10.0 );"+
-			"gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0)+water+sandy+grass+rocky+snowy;\n}",
-
-	}   );
-
-/*"uniform sampler2D oceanTexture;\n"+
-		"uniform sampler2D sandyTexture;\n"+
-		"uniform sampler2D grassTexture;\n"+
-		"uniform sampler2D rockyTexture;\n"+
-		"uniform sampler2D snowyTexture;\n"+
-		"varying vec2 vUV;\n"+
-		"varying float vAmount;\n"+
-		"void main(){\n"+ 
-			"vec4 water = (smoothstep(0.01, 0.25, vAmount) - smoothstep(0.24, 0.26, vAmount)) * texture2D( oceanTexture, vUV * 10.0 );\n"+
-			"vec4 sandy = (smoothstep(0.24, 0.27, vAmount) - smoothstep(0.28, 0.31, vAmount)) * texture2D( sandyTexture, vUV * 10.0 );\n"+
-			"vec4 grass = (smoothstep(0.28, 0.32, vAmount) - smoothstep(0.35, 0.40, vAmount)) * texture2D( grassTexture, vUV * 20.0 );\n"+
-			"vec4 rocky = (smoothstep(0.30, 0.50, vAmount) - smoothstep(0.40, 0.70, vAmount)) * texture2D( rockyTexture, vUV * 20.0 );\n"+
-			"vec4 snowy = (smoothstep(0.50, 0.65, vAmount))*texture2D( snowyTexture, vUV * 10.0 );"+
-			"gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0)+water+sandy+grass+rocky+snowy;\n}",*/
-
-	var planeGeo = new THREE.PlaneGeometry( 1000, 1000, 100, 100 );
-	var plane = new THREE.Mesh(	planeGeo, customMaterial );
-	plane.rotation.x = -Math.PI / 2;
-	plane.position.y = -100;
-	scene.add( plane );
-
-/*	var waterGeo = new THREE.PlaneGeometry( 1000, 1000, 1, 1 );
-	var waterTex = new THREE.ImageUtils.loadTexture( 'images/water512.jpg' );
-	waterTex.wrapS = waterTex.wrapT = THREE.RepeatWrapping; 
-	waterTex.repeat.set(5,5);
-	var waterMat = new THREE.MeshBasicMaterial( {map: waterTex, transparent:true, opacity:0.40} );
-	var water = new THREE.Mesh(	planeGeo, waterMat );
-	water.rotation.x = -Math.PI / 2;
-	water.position.y = -50;
-	scene.add( water);
-*/
-}
-/*
-function getHeightData(img,scale) {
-  
- if (scale == undefined) scale=1;
-  
-    var canvas = document.createElement( 'canvas' );
-    canvas.width = img.width;
-    canvas.height = img.height;
-    var context = canvas.getContext( '2d' );
- 
-    var size = img.width * img.height;
-    var data = new Float32Array( size );
- 
-    context.drawImage(img,0,0);
- 
-    for ( var i = 0; i < size; i ++ ) {
-        data[i] = 0
-    }
- 
-    var imgd = context.getImageData(0, 0, img.width, img.height);
-    var pix = imgd.data;
- 
-    var j=0;
-    for (var i = 0; i<pix.length; i +=4) {
-        var all = pix[i]+pix[i+1]+pix[i+2];
-        data[j++] = all/(12*scale);
-    }
-     
-    return data;
-}
-
-function getTerreno(img,material,width,height){
-var plane;
-var img = new Image();
-img.onload = function () {
-  
-    //get height data from img
-    var data = getHeightData(img);
-  
-    // plane
-    var geometry = new THREE.PlaneGeometry(width,height,img.width,img.height);
-    plane = new THREE.Mesh( geometry, material );
-	     
-    //set height of vertices
-    for ( var i = 0; i<plane.geometry.vertices.length; i++ ) {
-         plane.geometry.vertices[i].z = data[i];
-    }
- $.notify(plane);
-    //scene.add(plane);
-   
-};
-// load img source
-img.src = "heightmap/map1.bmp";
-$.notify(plane);
-return plane;
-}
-*/
-
 function cross(u,v){
 return new THREE.Vector3((u.y*v.z)-(u.z*v.y),
 						 -((u.x*v.z)-(v.x*u.z)),
@@ -615,96 +432,6 @@ sphere.position.y=y;
 sphere.position.z=z;
 scene.add(sphere);
 }
-function addTags(){
-blocker = document.createElement('div');
-blocker.setAttribute('id','blocker');
-instructions=document.createElement('div');
-
-instructions.setAttribute('id','instructions');
-var span = document.createElement('span');
-span.innerHTML="Click to play";
-span.style.fontSize="40px";
-var br = document.createElement('br');
-
-blocker.style.position="absolute";
-blocker.style.width="100%";
-blocker.style.height="100%";
-blocker.style.backgroundColor="rgba(0,0,0,0.5)";
-
-instructions.style.width="100%";
-instructions.style.height="100%";
-instructions.style.display="-webkit-box";
-instructions.style.display="-moz-box";
-instructions.style.display="box";
-instructions.style.display="box";
-instructions.style.textAlign="center";
-instructions.style.cursor="pointer";
-instructions.setAttribute('style','-webkit-box-orient: horizontal;-moz-box-orient: horizontal;box-orient: horizontal;-webkit-box-pack: center;-moz-box-pack: center;box-pack: center;-webkit-box-align: center;-moz-box-align: center;box-align: center;');
-instructions.appendChild(span);
-instructions.appendChild(br);
-instructions.innerHTML+="(W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)";
-
-
-instructions.style.position="absolute";
-instructions.style.top="50%";
-instructions.style.left="50%";
-instructions.style.transform="translate(-50%, -50%)";
-instructions.style.color="#FFFFFF"
-
-blocker.appendChild(instructions);
-document.body.insertBefore(blocker, document.body.firstChild);
-//document.getElementsByTagName("body")[0].insertBefore(blocker, document.getElementsByTagName("body")[0].firstChild);
-}
-function InitControls(){
-var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
-	if ( havePointerLock ) {
-	var element = document.body;
-	pointerlockchange = function ( event ) {
-	if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
-			controls.enable();
-			blocker.style.display = 'none';
-		} else {
-			controls.disable();
-			blocker.style.display = '-webkit-box';
-			blocker.style.display = '-moz-box';
-			blocker.style.display = 'box';
-			blocker.style.display = '';
-			}
-		}
-		var pointerlockerror = function ( event ) {
-			blocker.style.display = '';
-		}
-// Hook pointer lock state change events
-				document.addEventListener( 'pointerlockchange', pointerlockchange, false );
-				document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
-				document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
-				document.addEventListener( 'pointerlockerror', pointerlockerror, false );
-				document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
-				document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
-blocker.addEventListener( 'click', function ( event ) {
-					blocker.style.display = 'none';
-					element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-					if ( /Firefox/i.test( navigator.userAgent ) ) {
-						var fullscreenchange = function ( event ) {
-							if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-								document.removeEventListener( 'fullscreenchange', fullscreenchange );
-								document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-								element.requestPointerLock();
-							}
-						}
-						document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-						document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
-						element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-						element.requestFullscreen();
-					} else {
-						element.requestPointerLock();
-					}
-				}, false );
-			} else {
-				instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
-			}
-}
-
 	</script>
 	</body>
 </html>
