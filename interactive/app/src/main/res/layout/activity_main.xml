@@ -74,10 +74,10 @@
             android:layout_gravity="center"
             android:visibility="invisible"/>
         <Button
-            android:id="@+id/boton"
+            android:id="@+id/send"
             android:layout_width="300dp"
             android:layout_height="100dp"
-            android:text="Hola"
+            android:text="Send message"
             android:textSize="30dp"
             android:layout_marginLeft="15dp"/>
     </LinearLayout>

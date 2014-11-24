@@ -26,12 +26,11 @@ public class main extends Activity implements SensorEventListener {
 
     Socket socket;
     private Button boton;
-    Boolean state = false;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private float mLastX, mLastY, mLastZ;
     boolean mInitialized = false;
-    private final float NOISE = (float) 2.0;
+    private final float NOISE = (float) 18.0;
 
 
     @Override
@@ -42,20 +41,13 @@ public class main extends Activity implements SensorEventListener {
         //SocketIO Client
         socketIOSetUp();
 
-        boton = (Button)findViewById(R.id.boton);
+        boton = (Button)findViewById(R.id.send);
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(state) {
-                    boton.setText("Adios!");
-                    state = false;
-                }else{
-                    boton.setText("Hola!");
-                    state = true;
-                }
+            socket.emit("button", "Button pressed");
             }
         });
-
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -64,26 +56,37 @@ public class main extends Activity implements SensorEventListener {
 
     public void socketIOSetUp(){
         try {
-            socket = IO.socket("http://192.168.0.3:5000");
+            socket = IO.socket("http://192.168.0.5:5000");
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                socket.emit("foo", "hi");
-                socket.disconnect();
             }
-
         }).on("event", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
+
+            }
+        }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                System.out.println(args);
+                System.out.println("Connect error: " + args[0]);
+            }
+        }).on(Socket.EVENT_ERROR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                System.out.println(args);
+                System.out.println("Error: " + args[0]);
             }
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {}
         });
         socket.connect();
+        System.out.println("METHOD!!!");
     }
 
     @Override
@@ -119,8 +122,7 @@ public class main extends Activity implements SensorEventListener {
             iv.setVisibility(View.VISIBLE);
             if (deltaX > deltaY) {
                 iv.setImageResource(R.drawable.horizontal);
-            } else if (deltaY > deltaX) {
-                iv.setImageResource(R.drawable.vertical);
+                socket.emit("attack", "Attack!!!!");
             } else {
                 iv.setVisibility(View.INVISIBLE);
             }

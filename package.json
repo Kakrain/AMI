@@ -1,0 +1,10 @@
+{
+  "name": "ami",
+  "description": "Project",
+  "author": "David Barrera, Denny Schuldt",
+  "dependencies": {
+    "ejs" = 1.0.0,
+    "express": ">=4.6.1",
+    "socket.io": ">=1.2.1"
+  }
+}
