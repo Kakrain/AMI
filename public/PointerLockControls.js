@@ -5,8 +5,9 @@
 
 THREE.PointerLockControls = function ( camera ) {
 
+	var Ambiente=null;
 	var scope = this;
-	var altura=75;//1.7
+	var altura=1.7;
 	camera.rotation.set( 0, 0, 0 );
 
 	var pitchObject = new THREE.Object3D();
@@ -28,7 +29,9 @@ THREE.PointerLockControls = function ( camera ) {
 	var velocity = new THREE.Vector3();
 
 	var PI_2 = Math.PI / 2;
-
+	this.setAmbiente=function(ambiente){
+		Ambiente=ambiente;
+	}
 	var onMouseMove = function ( event ) {
 		
 
@@ -155,7 +158,7 @@ THREE.PointerLockControls = function ( camera ) {
 		velocity.z -= velocity.z * 10.0 * delta;
 		velocity.y -= 9.8 * altura*3 * delta; // 100.0 = mass
 //var vel=400.0;
-	var vel=altura*50;
+	var vel=altura*100;
 		if ( moveForward ) velocity.z -= vel * delta;
 		if ( moveBackward ) velocity.z += vel * delta;
 		if ( moveLeft ) velocity.x -= vel * delta;
@@ -166,11 +169,11 @@ THREE.PointerLockControls = function ( camera ) {
 			yawObject.translateX( velocity.x * delta );
 			yawObject.translateY( velocity.y * delta ); 
 			yawObject.translateZ( velocity.z * delta );
-
-			if ( yawObject.position.y < altura ) {
+		var posy=altura+(Ambiente!=null)?(Ambiente.getYat(yawObject.position.x,yawObject.position.z)):0;
+			if ( yawObject.position.y < posy ) {
 
 				velocity.y = 0;
-				yawObject.position.y = altura;
+				yawObject.position.y = posy;
 
 				canJump = true;
 

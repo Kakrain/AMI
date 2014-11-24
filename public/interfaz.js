@@ -5,7 +5,11 @@ function Interfaz (camera,scene) {
 	var pointerlockerror=null;
 	var controls= new THREE.PointerLockControls( camera );
 	scene.add( controls.getObject() );
+
 	
+this.setAmbiente=function(ambiente){
+	controls.setAmbiente(ambiente);
+}
 this.update=function(){
 	controls.isOnObject( false );
 	controls.update();

@@ -17,11 +17,11 @@
 		</style>
 	</head>
 	<body>
+		<script src="three.min.js"></script>
 		<script src="csg.js"></script>
 		<script src="threeCSG.js"></script>
 		<script src="jquery-1.11.1.min.js"></script>
 		<script src="notify.min.js"></script>
-		<script src="three.min.js"></script>
 		<script src="PointerLockControls.js"></script>
 		<script src="interfaz.js"></script>
 		<script src="Raycaster.js"></script>
@@ -51,18 +51,21 @@ THREE.ImageUtils.crossOrigin = "anonymous";
 
 
 	var ambiente=new ambienteMatico(scene);
+
+	interface1.setAmbiente(ambiente);
 //placas tectonicas
 	ambiente.addPlaca('map/dirt-512.jpg',40,10);//url de la textura, peso con respecto a la altura, numero de veces que se repite esta
 	ambiente.addPlaca('map/sand-512.jpg',7.7,10);
 	ambiente.addPlaca('map/grass-512.jpg',12.3,10);
 	ambiente.addPlaca('map/rock-512.jpg',16.9,10);
-	ambiente.addPlaca('map/snow-512.jpg',23,10);
+	ambiente.addPlaca('map/snow-512.jpg',10,5);
 
 ambiente.setDifuminado(0.1);//default es 0.02
 	ambiente.setHeightMap("map/heightmap.png");
 	
 	ambiente.setSkybox("dawn");//era Cementary
 	ambiente.setMar("map/water512.jpg");
+
 	ambiente.generate();	
 
 
@@ -70,7 +73,7 @@ var weapon=new Arma(30,2,1);
 var c = new THREE.Mesh( new THREE.BoxGeometry( 0.4, 1.5, 0.4 ), new THREE.MeshLambertMaterial({color:'red'}));
 			c.position.x=15;
 			c.position.z=15;
-var enemy=new SerVivo (c,scene,allies,enemies);
+var enemy=new SerVivo (c,scene,ambiente,allies,enemies);
 enemy.addArma(weapon);
 
 
@@ -79,7 +82,7 @@ var cil= new THREE.Mesh( new THREE.CylinderGeometry( 0.1, 0.5,1.7 ), new THREE.M
 			cil.position.z=1;
 			cil.position.x=15;
 			scene.add(cil);
-var ally=new SerVivo (cil,scene,enemies,allies);
+var ally=new SerVivo (cil,scene,ambiente,enemies,allies);
 ally.addArma(weapon.clone());
 
 var hemiLight,dirLight,light;
@@ -128,13 +131,15 @@ this.getRange=function(){
 this.atacar=function(enemy,dt){
 	time+=dt;
 	if(time>cadencia){
-		//$.notify("owner: "+owner);
-		enemy.setHealth(enemy.getHealth()-damage);
+		enemy.setHealth(enemy.getHealth()-damage,owner);
 		
 		var vector = new THREE.Vector3(0,0,1);
 		var mesh=owner.getMesh();
    vector.applyQuaternion(mesh.quaternion);
 var vectorInit=vector.clone().applyAxisAngle (new THREE.Vector3(1,0,0), Math.PI/4);
+var angle=(Math.random())*Math.PI*2;
+vectorInit.applyAxisAngle (vector,angle);
+//$.notify(""+vectorInit);
 //dibujarLinea(mesh.position,mesh.position.clone().add(vectorInit.multiplyScalar(range)),"red");
 //dibujarLinea(mesh.position,mesh.position.clone().add(vector.multiplyScalar(range)),"blue");
 var plano= getPlano(mesh.position,mesh.position.clone().add(vectorInit.multiplyScalar(range)),mesh.position,mesh.position.clone().add(vector.multiplyScalar(range)));
@@ -160,11 +165,11 @@ this.clone=function(){
 	return new Arma(damage,range,rate);
 }
 }
-function SerVivo (o,scene,_enemies,_allies) {
+function SerVivo (o,scene,_ambiente,_enemies,_allies) {
 	var tiempoPutrefaccion=2;
    var range=80;
    var velocity=3;
-   	
+   var ambiente=_ambiente;
    var object = o;
    var focus=null;
    var destino=null;
@@ -175,7 +180,8 @@ function SerVivo (o,scene,_enemies,_allies) {
    var health=100;
    scene.add(object);
    var box = new THREE.Box3().setFromObject(object);
-   object.position.y=(box.max.y-box.min.y)/2;
+   var altura=(box.max.y-box.min.y)/2;
+   object.position.y=altura
    this.accion=null;//cada accion deberia tener una parte de actuar y otra de check;
    var vector = new THREE.Vector3( 0, 0,-1);
    vector.applyQuaternion(object.quaternion );
@@ -198,11 +204,13 @@ this.podrirse=function(dt){
 		allies.splice(allies.indexOf(this),1);//elimina
 	}
 }
-this.setHealth=function(h){
+this.setHealth=function(h,who){
 	health=h;
 	if(health<=0){//ha muerto
 		health=0;
 		this.accion=this.podrirse;
+	}else{
+		if(focus==null){this.accion=this.atacar;focus=who;}
 	}
 }
 this.getHealth=function(){
@@ -291,11 +299,14 @@ vector.y=0;
 var dist=vector.clone();
 vector.normalize();
 vector=vector.multiplyScalar(dt*velocity);
+
 if(vector.length()<dist.length()){
 object.position.add(vector);
+object.position.y=ambiente.getYat(object.position.x,object.position.z)+altura;//+altura
 return false;
 }else{
 object.position.add(dist);
+object.position.y=ambiente.getYat(object.position.x,object.position.z)+altura;///+altura
 return true;//no pasa
 }
 }

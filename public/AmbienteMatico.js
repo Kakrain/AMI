@@ -8,9 +8,11 @@ var HeightData=null;
 var maxHeight=null;
 
 var plane=null;
+var planeFisico=null
 var skybox=null
 var img=null;
 
+var offSetY=4;
 var altura=-100;
 var nivelMar=50;
 
@@ -20,11 +22,20 @@ var height=1000;
 
 var Placas=[];
 
+this.setOffsetY=function(n){
+	offSetY=n;
+}
+this.getYat=function(x,z){
+	return getYat(x,z);
+}
 this.setMar=function(url){
  	marUrl=url;
 }
 this.setnivelMar=function(n){
  	nivelMar=n;
+}
+this.getAltura=function(){
+	return altura;
 }
 this.setAltura=function(h){
  	altura=h;
@@ -77,16 +88,20 @@ var getMaxHeight=function(dat){
     return max;
 }
 var getHeightData =function(img,scale) {
-    var canvas = document.createElement( 'canvas' );
+     var canvas = document.createElement( 'canvas' );
     canvas.width = img.width;
     canvas.height = img.height;
     var context = canvas.getContext( '2d' );
+ 
     var size = img.width * img.height;
     var data = new Float32Array( size );
+ 
     context.drawImage(img,0,0);
+ 
     for ( var i = 0; i < size; i ++ ) {
         data[i] = 0
     }
+ 
     var imgd = context.getImageData(0, 0, img.width, img.height);
     var pix = imgd.data;
  
@@ -95,9 +110,10 @@ var getHeightData =function(img,scale) {
         var all = pix[i]+pix[i+1]+pix[i+2];
         data[j++] = all/(12*scale);
     }
+     
     return data;
 }
-var drawTerreno=function(img,material,width,height){
+var drawTerreno=function(){
 var textures=[];
 var s="";
 for (var i = 0; i<Placas.length; i++) {
@@ -114,12 +130,10 @@ s+="texture"+i+":	{ type: 't', value: textures["+i+"]},"
 		"bumpTexture:	{ type: 't', value: bumpTexture },"+
 		"bumpScale:	    { type: 'f', value: bumpScale },"+s+
 	"};");
- 
 var s1="";
 var s2="";
 var s3="";
 var max=maxHeight;
-max+=10;
 var sum=0;
 for (var i = 0; i<Placas.length; i++) {
 	sum+=Placas[i][1];
@@ -134,11 +148,11 @@ for (var i = 0; i<textures.length; i++) {
 		s2+="vec4 t"+i+"=(smoothstep(0.01,"+(m-d/2)+",vAmount)-smoothstep("+(m-d/2)+","+(m+d/2)+", vAmount))*texture2D( texture"+i+", vUV *"+(Placas[i][2]).toFixed(2)+");";
 	}
 	else 
-	if(i==(textures.length-2)){
-		s2+="vec4 t"+i+"=(smoothstep("+(ant-d/2)+","+(ant+d/2)+",vAmount)-smoothstep("+m+","+(m+((Placas[i+1][1]*max)/sum))+",vAmount))*texture2D(texture"+i+",vUV*"+(Placas[i][2]).toFixed(2)+");";
-	}else 
+	//if(i==(textures.length-2)){
+		//s2+="vec4 t"+i+"=(smoothstep("+(ant-d/2)+","+(ant+d/2)+",vAmount)-smoothstep("+(m-d/2)+","+(m+((Placas[i+1][1]*max)/sum+d/2))+",vAmount))*texture2D(texture"+i+",vUV*"+(Placas[i][2]).toFixed(2)+");";
+	//}else 
 	if(i==textures.length-1){
-		s2+="vec4 t"+i+"=(smoothstep("+ant+","+m+", vAmount))*texture2D( texture"+i+", vUV *"+(Placas[i][2]).toFixed(2)+");"
+		s2+="vec4 t"+i+"=(smoothstep("+(ant-d/2)+","+(m)+", vAmount))*texture2D( texture"+i+", vUV*"+(Placas[i][2]).toFixed(2)+");"
 	}
 	else
 	{
@@ -146,6 +160,7 @@ for (var i = 0; i<textures.length; i++) {
 	}
 	s3+="+t"+i;
 }
+
 var customMaterial = new THREE.ShaderMaterial( 
 	{
 	    uniforms: customUniforms,
@@ -168,11 +183,15 @@ var customMaterial = new THREE.ShaderMaterial(
 			"gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0)"+s3+";}",
 
 	}   );
+
 	var planeGeo = new THREE.PlaneGeometry( 1000, 1000, 100, 100 );
-	var plane = new THREE.Mesh(	planeGeo, customMaterial );
+	plane = new THREE.Mesh(	planeGeo, customMaterial );
 	plane.rotation.x = -Math.PI / 2;
-	plane.position.y = -100;
+	plane.position.y = altura; 
+	generateRustico();
 	scene.add( plane );
+
+
 
 if(marUrl!=null){
 	var waterGeo = new THREE.PlaneGeometry( width, height, 1, 1 );
@@ -186,5 +205,53 @@ if(marUrl!=null){
 	scene.add(water);
 	}
 
+}
+function generateRustico(){
+    // plane
+    var geometry = new THREE.PlaneGeometry(width,height,img.width-1,img.height-1);
+    var texture = THREE.ImageUtils.loadTexture(heightmapUrl);
+    var material = new THREE.MeshLambertMaterial( { map: texture } );
+    planeFisico = new THREE.Mesh( geometry, material );
+    
+     
+    //set height of vertices
+    for ( var i = 0; i<planeFisico.geometry.vertices.length; i++ ) {
+         planeFisico.geometry.vertices[i].z = HeightData[i]*3;
+    }
+    planeFisico.rotation.x = -Math.PI / 2;
+	planeFisico.position.y = altura//-100;
+	planeFisico.material.side = THREE.DoubleSide;
+	planeFisico.material.opacity=0.5;
+	planeFisico.material.transparent=true
+    
+}
+this.drawRustico=function(){
+	scene.add(planeFisico);
+}
+function createSphere(x,y,z,color){
+var sphere = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshPhongMaterial({color: color}) );
+sphere.position.x=x;
+sphere.position.y=y;
+sphere.position.z=z;
+scene.add(sphere);
+}
+function realPositionAt(i){
+	var v=planeFisico.geometry.vertices[i].clone();
+	v.y=planeFisico.geometry.vertices[i].z+altura;
+	v.z=-planeFisico.geometry.vertices[i].y;
+	return v;
+}
+var getYat=function(x,z){
+	var init=realPositionAt(0);
+	var ix=((x-init.x)*(img.width))/(width);
+	ix=Math.floor(ix);
+	var iz=((z-init.z)*img.height)/(height);
+	iz=Math.floor(iz);
+	if(ix<0){ix=0;}
+	else if(ix>=img.width-1){ix=img.width-1;}
+	if(iz<0){iz=0;}
+	else if(iz>(img.height-1)){iz=(img.height-1);}
+var i=ix+iz*(img.width);
+return realPositionAt(i).y+offSetY;
 }
 }
