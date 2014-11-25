@@ -1,31 +1,18 @@
-var express = require('express'),
-      app       = express(),
-      http       = require('http').Server(app),
-	  io          = require('socket.io')(http),
-	  path      = require('path');
-
-app.engine('.html', require('ejs').__express);
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'html');
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 app.get('/', function(req, res){
-    res.render('index');
+  res.sendfile('index.html');
 });
 
 io.on('connection', function(socket){
-	console.log("user connected");
-	socket.on('button', function(msg){
-		console.log(msg);
-	});
-	socket.on('attack', function(msg){
-		console.log(msg);
-	});
-	socket.on('disconnect', function(){
-		console.log('User disconnected');
+	console.log('a user connected');
+	socket.on('attack',function(){
+		console.log('Atacando!');
 	});
 });
 
-var port = Number(process.env.PORT || 5000);
-app.listen(port, function() {
-  console.log("Listening on " + port);
+http.listen(3000, function(){
+  console.log('listening on *:3000');
 });

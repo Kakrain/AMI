@@ -56,37 +56,30 @@ public class main extends Activity implements SensorEventListener {
 
     public void socketIOSetUp(){
         try {
-            socket = IO.socket("http://192.168.0.5:5000");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+            socket = IO.socket("http://192.168.0.5:3000");
+        } catch (URISyntaxException e) { e.printStackTrace(); }
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-            }
-        }).on("event", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-
+                System.out.println("CONECTADO");
             }
         }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                System.out.println(args);
                 System.out.println("Connect error: " + args[0]);
             }
         }).on(Socket.EVENT_ERROR, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                System.out.println(args);
-                System.out.println("Error: " + args[0]);
+
             }
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
-            public void call(Object... args) {}
+            public void call(Object... args) {
+
+            }
         });
         socket.connect();
-        System.out.println("METHOD!!!");
     }
 
     @Override
@@ -122,7 +115,8 @@ public class main extends Activity implements SensorEventListener {
             iv.setVisibility(View.VISIBLE);
             if (deltaX > deltaY) {
                 iv.setImageResource(R.drawable.horizontal);
-                socket.emit("attack", "Attack!!!!");
+                if(socket.connected())
+                    socket.emit("attack", "Attack!!!!");
             } else {
                 iv.setVisibility(View.INVISIBLE);
             }
