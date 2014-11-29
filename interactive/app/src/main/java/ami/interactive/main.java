@@ -56,7 +56,7 @@ public class main extends Activity implements SensorEventListener {
 
     public void socketIOSetUp(){
         try {
-            socket = IO.socket("http://192.168.0.5:3000");
+            socket = IO.socket("http://192.168.137.150:3000");
         } catch (URISyntaxException e) { e.printStackTrace(); }
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
@@ -120,6 +120,9 @@ public class main extends Activity implements SensorEventListener {
             } else {
                 iv.setVisibility(View.INVISIBLE);
             }
+            if (deltaZ > deltaY)
+                if(socket.connected())
+                    socket.emit("protect", "Protect!!!!");
         }
     }
 

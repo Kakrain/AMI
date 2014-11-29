@@ -7,7 +7,7 @@ THREE.PointerLockControls = function ( camera ) {
 
 	var Ambiente=null;
 	var scope = this;
-	var altura=41.7;
+	var altura=20;
 	camera.rotation.set( 0, 0, 0 );
 	var pitchObject = new THREE.Object3D();
 	pitchObject.add( camera );
