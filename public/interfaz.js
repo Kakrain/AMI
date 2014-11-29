@@ -11,14 +11,13 @@ this.setAmbiente=function(ambiente){
 	controls.setAmbiente(ambiente);
 }
 this.update=function(){
-	controls.isOnObject( false );
+	controls.isOnObject(false);
 	controls.update();
 }
 this.enabled=function(){
 	return controls.enabled;
 }
 this.addTags=function(){
-//this.blocker = document.createElement('div');
 blocker.setAttribute('id','blocker');
 instructions=document.createElement('div');
 
@@ -54,7 +53,6 @@ instructions.style.transform="translate(-50%, -50%)";
 instructions.style.color="#FFFFFF"
 
 blocker.appendChild(instructions);
-//document.getElementsByTagName("body")[0].insertBefore(blocker, document.getElementsByTagName("body")[0].firstChild);
 document.body.insertBefore(blocker, document.body.firstChild);
 }
 this.InitControls=function(){

@@ -7,14 +7,16 @@ THREE.PointerLockControls = function ( camera ) {
 
 	var Ambiente=null;
 	var scope = this;
-	var altura=1.7;
+	var altura=41.7;
 	camera.rotation.set( 0, 0, 0 );
-
 	var pitchObject = new THREE.Object3D();
 	pitchObject.add( camera );
 
 	var yawObject = new THREE.Object3D();
 	yawObject.add( pitchObject );
+	yawObject.position.x=0.01;
+	yawObject.position.z=0.0;
+	yawObject.position.z=0.01;
 
 	var moveForward = false;
 	var moveBackward = false;
@@ -29,6 +31,7 @@ THREE.PointerLockControls = function ( camera ) {
 	var velocity = new THREE.Vector3();
 
 	var PI_2 = Math.PI / 2;
+	
 	this.setAmbiente=function(ambiente){
 		Ambiente=ambiente;
 	}
@@ -77,14 +80,16 @@ THREE.PointerLockControls = function ( camera ) {
 				break;
 
 			case 32: // space
-				if ( canJump === true ) velocity.y += altura*12;//velocity.y += 350;
+				if (canJump === true ) velocity.y += altura*12;//velocity.y += 350;
 				canJump = false;
 				break;
 
 		}
 
 	};
-
+	var getAltura=function(){
+		return altura;
+	}
 	var onKeyUp = function ( event ) {
 
 		switch( event.keyCode ) {
@@ -163,23 +168,37 @@ THREE.PointerLockControls = function ( camera ) {
 		if ( moveBackward ) velocity.z += vel * delta;
 		if ( moveLeft ) velocity.x -= vel * delta;
 		if ( moveRight ) velocity.x += vel * delta;
-		if ( isOnObject === true ) {
+		if (isOnObject === true ) {
 			velocity.y = Math.max( 0, velocity.y );
 		}
 			yawObject.translateX( velocity.x * delta );
 			yawObject.translateY( velocity.y * delta ); 
 			yawObject.translateZ( velocity.z * delta );
-		var posy=altura+(Ambiente!=null)?(Ambiente.getYat(yawObject.position.x,yawObject.position.z)):0;
+			if(Ambiente!=null){
+				if(yawObject.position.x>(Ambiente.getWidth()/2-10)){
+					yawObject.position.x=(Ambiente.getWidth()/2-10);
+				}else{
+					if(yawObject.position.x<-(Ambiente.getWidth()/2-10)){
+					yawObject.position.x=-(Ambiente.getWidth()/2-10);
+					}
+				}
+				if(yawObject.position.z>(Ambiente.getHeight()/2-10)){
+					yawObject.position.z=(Ambiente.getHeight()/2-10);
+				}else{
+					if(yawObject.position.z<-(Ambiente.getHeight()/2-10)){
+					yawObject.position.z=-(Ambiente.getHeight()/2-10);
+					}
+				}
+			}
+			var	posy=altura+((Ambiente!=null)?(Ambiente.getYat(yawObject.position)):0);
 			if ( yawObject.position.y < posy ) {
-
 				velocity.y = 0;
 				yawObject.position.y = posy;
-
 				canJump = true;
-
 			}
 		}
 		prevTime = time;
 	};
-
+	onKeyDown(38);
+	onKeyUp(38);
 };

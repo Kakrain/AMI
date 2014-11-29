@@ -7,12 +7,12 @@ var marUrl=null;
 var HeightData=null;
 var maxHeight=null;
 
+offSetY=1;
 var plane=null;
 var planeFisico=null
 var skybox=null
 var img=null;
 
-var offSetY=4;
 var altura=-100;
 var nivelMar=50;
 
@@ -21,12 +21,17 @@ var width=1000;
 var height=1000;
 
 var Placas=[];
-
+this.getWidth=function(){
+	return width;
+}
+this.getHeight=function(){
+	return height;
+}
 this.setOffsetY=function(n){
 	offSetY=n;
 }
-this.getYat=function(x,z){
-	return getYat(x,z);
+this.getYat=function(v){
+	return getYat(v);
 }
 this.setMar=function(url){
  	marUrl=url;
@@ -123,7 +128,7 @@ s+="texture"+i+":	{ type: 't', value: textures["+i+"]},"
 }
 
 	var bumpTexture = THREE.ImageUtils.loadTexture(heightmapUrl);
-	bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping; 
+	bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping;
 
 	var bumpScale   = 200.0;
  eval("var customUniforms ={"+
@@ -184,7 +189,7 @@ var customMaterial = new THREE.ShaderMaterial(
 
 	}   );
 
-	var planeGeo = new THREE.PlaneGeometry( 1000, 1000, 100, 100 );
+	var planeGeo = new THREE.PlaneGeometry( width, height, img.width-1,img.height-1);
 	plane = new THREE.Mesh(	planeGeo, customMaterial );
 	plane.rotation.x = -Math.PI / 2;
 	plane.position.y = altura; 
@@ -198,7 +203,7 @@ if(marUrl!=null){
 	var waterTex = new THREE.ImageUtils.loadTexture(marUrl);
 	waterTex.wrapS = waterTex.wrapT = THREE.RepeatWrapping; 
 	waterTex.repeat.set(5,5);
-	var waterMat = new THREE.MeshBasicMaterial( {map: waterTex, transparent:true, opacity:0.40} );
+	var waterMat = new THREE.MeshBasicMaterial( {side:THREE.DoubleSide, map: waterTex, transparent:true, opacity:0.40} );
 	var water = new THREE.Mesh(	planeGeo, waterMat );
 	water.rotation.x = -Math.PI / 2;
 	water.position.y =altura+nivelMar;
@@ -219,17 +224,18 @@ function generateRustico(){
          planeFisico.geometry.vertices[i].z = HeightData[i]*3;
     }
     planeFisico.rotation.x = -Math.PI / 2;
-	planeFisico.position.y = altura//-100;
+	planeFisico.position.y = altura+offSetY;
 	planeFisico.material.side = THREE.DoubleSide;
 	planeFisico.material.opacity=0.5;
-	planeFisico.material.transparent=true
-    
+	planeFisico.material.transparent=true;
+	//planeFisico.material.wireframe=true;
+	scene.add(planeFisico);
 }
 this.drawRustico=function(){
 	scene.add(planeFisico);
 }
 function createSphere(x,y,z,color){
-var sphere = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshPhongMaterial({color: color}) );
+var sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5), new THREE.MeshPhongMaterial({color: color}) );
 sphere.position.x=x;
 sphere.position.y=y;
 sphere.position.z=z;
@@ -237,21 +243,65 @@ scene.add(sphere);
 }
 function realPositionAt(i){
 	var v=planeFisico.geometry.vertices[i].clone();
-	v.y=planeFisico.geometry.vertices[i].z+altura;
+	v.y=planeFisico.geometry.vertices[i].z+altura+offSetY;
 	v.z=-planeFisico.geometry.vertices[i].y;
 	return v;
 }
-var getYat=function(x,z){
+var getYat=function(v){
 	var init=realPositionAt(0);
-	var ix=((x-init.x)*(img.width))/(width);
-	ix=Math.floor(ix);
-	var iz=((z-init.z)*img.height)/(height);
-	iz=Math.floor(iz);
-	if(ix<0){ix=0;}
-	else if(ix>=img.width-1){ix=img.width-1;}
-	if(iz<0){iz=0;}
-	else if(iz>(img.height-1)){iz=(img.height-1);}
-var i=ix+iz*(img.width);
-return realPositionAt(i).y+offSetY;
+	var vectors=[];
+	var ixf,izf,ixc,izc;
+	var ix=((v.x-init.x)*img.width)/(width);
+	ixf=Math.floor(ix);
+	ixc=Math.ceil(ix);
+	var iz=((v.z-init.z)*img.height)/(height);
+	izf=Math.floor(iz);
+	izc=Math.ceil(iz);
+	if(ixf<0){ixf=0;}
+	else if(ixf>=img.width-1){ixf=img.width-1;}
+	if(izf<0){izf=0;}
+	else if(izf>(img.height-1)){izf=(img.height-1);}
+	if(ixc<0){ixc=0;}
+	else if(ixc>=img.width-1){ixc=img.width-1;}
+	if(izc<0){izc=0;}
+	else if(izc>(img.height-1)){izc=(img.height-1);}
+	var i;
+i=ixf+izf*(img.width);
+vectors[vectors.length]=realPositionAt(i);//1
+
+i=ixf+izc*(img.width);
+vectors[vectors.length]=realPositionAt(i);//3
+
+i=ixc+izf*(img.width);
+vectors[vectors.length]=realPositionAt(i);//2
+
+i=ixc+izc*(img.width);
+vectors[vectors.length]=realPositionAt(i);//4
+
+
+var px =(v.x-vectors[0].x)/(vectors[2].x-vectors[0].x);
+var pz =(v.z-vectors[0].z)/(vectors[1].z-vectors[0].z);
+
+var max=0;
+var mi;
+var d;
+for (i=vectors.length-1;i>=0;i--){
+	d=vectors[i].distanceTo(v);
+	if(d>max){
+		max=d;
+		mi=i;
+	}
+};
+var p = new THREE.Plane();
+
+if(px+pz<1){//A
+	p.setFromCoplanarPoints (vectors[0],vectors[1],vectors[2]);
+}else{//B
+	p.setFromCoplanarPoints (vectors[1],vectors[2],vectors[3]);
+}
+var ray = new THREE.Ray (new THREE.Vector3(v.x,v.y,v.z), new THREE.Vector3(0, -1, 0));
+var where = v.clone();//new THREE.Vector3(0,0,0);
+ray.intersectPlane (p,where);
+return where.y;
 }
 }

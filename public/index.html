@@ -18,6 +18,7 @@
 	</head>
 	<body>
 		<script src="three.min.js"></script>
+		<script src="three.js"></script>
 		<script src="csg.js"></script>
 		<script src="threeCSG.js"></script>
 		<script src="jquery-1.11.1.min.js"></script>
@@ -49,10 +50,7 @@ var enemies=[];
 var interface1=new Interfaz (camera,scene);
 THREE.ImageUtils.crossOrigin = "anonymous";
 
-
-	var ambiente=new ambienteMatico(scene);
-
-	interface1.setAmbiente(ambiente);
+	var ambiente=new ambienteMatico(scene);	
 //placas tectonicas
 	ambiente.addPlaca('map/dirt-512.jpg',40,10);//url de la textura, peso con respecto a la altura, numero de veces que se repite esta
 	ambiente.addPlaca('map/sand-512.jpg',7.7,10);
@@ -67,7 +65,7 @@ ambiente.setDifuminado(0.1);//default es 0.02
 	ambiente.setMar("map/water512.jpg");
 
 	ambiente.generate();	
-
+interface1.setAmbiente(ambiente);
 
 var weapon=new Arma(30,2,1);
 var c = new THREE.Mesh( new THREE.BoxGeometry( 0.4, 1.5, 0.4 ), new THREE.MeshLambertMaterial({color:'red'}));
@@ -75,8 +73,9 @@ var c = new THREE.Mesh( new THREE.BoxGeometry( 0.4, 1.5, 0.4 ), new THREE.MeshLa
 			c.position.z=15;
 var enemy=new SerVivo (c,scene,ambiente,allies,enemies);
 enemy.addArma(weapon);
-
-
+enemy.addPatrolPosition(new THREE.Vector3(10,0,10));
+enemy.addPatrolPosition(new THREE.Vector3(-10,0,10));
+enemy.addPatrolPosition(new THREE.Vector3(10,0,-10));
 var cil= new THREE.Mesh( new THREE.CylinderGeometry( 0.1, 0.5,1.7 ), new THREE.MeshLambertMaterial({color:'yellow'}));
 			cil.position.y=0.5;
 			cil.position.z=1;
@@ -167,6 +166,9 @@ this.clone=function(){
 }
 function SerVivo (o,scene,_ambiente,_enemies,_allies) {
 	var tiempoPutrefaccion=2;
+	var patrulla=[];
+	var ipatrulla=0;
+	var sign=1;
    var range=80;
    var velocity=3;
    var ambiente=_ambiente;
@@ -189,6 +191,18 @@ function SerVivo (o,scene,_ambiente,_enemies,_allies) {
    var dead=null;
    allies.splice(1,0,this);//añade
 //dibujarLinea(object.position, object.position.clone().add(vector.multiplyScalar(range)),"green");
+var advancePatrolPosition=function(){
+	if(patrulla.length<2){return;}
+	ipatrulla+=sign;
+	if(ipatrulla==patrulla.length||ipatrulla<0){
+		sign*=-1;
+		ipatrulla+=sign*2;
+	}
+
+}
+this.addPatrolPosition=function(vector){
+	patrulla[patrulla.length]=vector;
+}
 this.addArma=function(arm){
  arma=arm;
  arma.setOwner(this);
@@ -255,7 +269,7 @@ if(ene!=null){//si encuentra un enemigo
 	this.accion=this.atacar;
 	return;
 }
-if(destino!=null){
+if(destino!=null||patrulla.length!=0){
 	this.accion=this.mover;
 }
 }
@@ -288,6 +302,12 @@ this.mover = function(dt) {
 	   			destino=null;
 	   			this.accion=this.idle;
 	   		}
+	   	}else{
+	   		if(patrulla.length!=0){
+	   			if(this.goTo(dt,patrulla[ipatrulla])){//retorna booleano que indica si llego o no
+		   		  	advancePatrolPosition();
+	   			}
+	   		}
 	   	}
    	}
 this.goTo=function(dt,position){
@@ -302,11 +322,11 @@ vector=vector.multiplyScalar(dt*velocity);
 
 if(vector.length()<dist.length()){
 object.position.add(vector);
-object.position.y=ambiente.getYat(object.position.x,object.position.z)+altura;//+altura
+object.position.y=ambiente.getYat(object.position)+altura;//+altura
 return false;
 }else{
 object.position.add(dist);
-object.position.y=ambiente.getYat(object.position.x,object.position.z)+altura;///+altura
+object.position.y=ambiente.getYat(object.position)+altura;///+altura
 return true;//no pasa
 }
 }
