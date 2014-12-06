@@ -119,7 +119,7 @@ function setSpot(_scene){
 }
 
 function createSphere(x,y,z,color){
-	var sphere = new THREE.Mesh(new THREE.SphereGeometry(0.1), new THREE.MeshPhongMaterial({color: color}) );
+	var sphere = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshPhongMaterial({color: color}) );
 	sphere.position.x = x;
 	sphere.position.y = y;
 	sphere.position.z = z;

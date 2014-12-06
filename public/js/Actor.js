@@ -1,4 +1,4 @@
-function Actor (_object,scene,_ambiente,_enemies,_allies) {
+function Actor (_body,scene,_ambiente,_enemies,_allies) {
 	
 	var tiempoPutrefaccion = 2,
 		patrulla     = [],
@@ -7,7 +7,8 @@ function Actor (_object,scene,_ambiente,_enemies,_allies) {
 		range        = 80,
 		velocity     = 3,
 		ambiente   = _ambiente,
-		object        = _object,
+		body        = _body,
+		mesh =body.getMesh(),
 		focus         = null,
 		destino      = null,
 		allies         = _allies,
@@ -16,16 +17,24 @@ function Actor (_object,scene,_ambiente,_enemies,_allies) {
 		health       = 100,
 		dead         = null,
 		y               = new THREE.Vector3( 0, 1,0),
-		box           = new THREE.Box3().setFromObject(object),
+		box           = new THREE.Box3().setFromObject(mesh),
 		altura        = (box.max.y-box.min.y)/2,
 		vector       = new THREE.Vector3( 0, 0,-1);
-	object.position.y = altura;
-	scene.add(object);
+	mesh.position.y = altura;
 	this.accion = null;   
-	vector.applyQuaternion(object.quaternion);
-	var vision = new THREE.Raycaster(object.position, vector, 1, range);
+	vector.applyQuaternion(mesh.quaternion);
+	var vision = new THREE.Raycaster(mesh.position, vector, 1, range);
 	allies.splice(1,0,this);
 
+this.setPosition=function(x,y,z){
+	mesh.position.x=x;
+	mesh.position.y=y;
+	mesh.position.z=z;
+}
+this.setAzimut=function(angle){
+	$.notify("vec: "+mesh.rotation.x);
+	mesh.rotation.applyAxisAngle(y,angle);
+}
 	var advancePatrolPosition = function(){
 		if(patrulla.length<2){return;}
 		ipatrulla += sign;
@@ -39,7 +48,8 @@ function Actor (_object,scene,_ambiente,_enemies,_allies) {
 		patrulla[patrulla.length] = vector;
 	}
 
-	this.addArma = function(_weapon){
+	this.addArma = function(_weapon,mesh){
+		body.addWeapon(mesh);
 		arma = _weapon;
 		arma.setOwner(this);
 	}
@@ -75,7 +85,7 @@ function Actor (_object,scene,_ambiente,_enemies,_allies) {
 	}
 
 	this.getMesh = function(){
-		return object;
+		return mesh;
 	}
 
 	this.setDestino = function(_destiny){
@@ -83,11 +93,11 @@ function Actor (_object,scene,_ambiente,_enemies,_allies) {
 	}
 
 	this.estaCerca = function(enemy){
-		return object.position.distanceTo(enemy.getMesh().position) <= range;
+		return mesh.position.distanceTo(enemy.getMesh().position) <= range;
 	}
 	
 	this.dentroRangoAtaque = function(enemy){
-		return object.position.distanceTo(enemy.getMesh().position) <= arma.getRange();
+		return mesh.position.distanceTo(enemy.getMesh().position) <= arma.getRange();
 	} 
 	
 	this.observar = function(){
@@ -95,10 +105,10 @@ function Actor (_object,scene,_ambiente,_enemies,_allies) {
 			ene      = null,
 			dist      = 99999,
 			d;
-		vector.applyQuaternion(object.quaternion);
+		vector.applyQuaternion(mesh.quaternion);
 		for (var i=0; i<enemies.length; i++) { 
-			if(this.estaCerca(enemies[i])&&Math.abs(vector.angleTo(enemies[i].getMesh().position.clone().sub(object.position))) <= Math.PI/4){
-				d = object.position.distanceTo(enemies[i].getMesh().position);
+			if(this.estaCerca(enemies[i])&&Math.abs(vector.angleTo(enemies[i].getMesh().position.clone().sub(mesh.position))) <= Math.PI/4){
+				d = mesh.position.distanceTo(enemies[i].getMesh().position);
 				if(d < dist){
 					ene = enemies[i];
 					dist = d;
@@ -166,21 +176,21 @@ function Actor (_object,scene,_ambiente,_enemies,_allies) {
 	}
 
 	this.goTo = function(dt,position){
-		position.y = object.position.y;
-		object.lookAt(position);
+		position.y = mesh.position.y;
+		mesh.lookAt(position);
 		var vector = new THREE.Vector3( 0, 0, -1 );
-			vector.subVectors(position,object.position);
+			vector.subVectors(position,mesh.position);
 			vector.y = 0;
 		var dist = vector.clone();
 			vector.normalize();
 			vector = vector.multiplyScalar(dt*velocity);
 		if(vector.length() < dist.length()){
-			object.position.add(vector);
-			object.position.y = ambiente.getYat(object.position) + altura;
+			mesh.position.add(vector);
+			mesh.position.y = ambiente.getYat(mesh.position) + altura;
 			return false;
 		}else{
-			object.position.add(dist);
-			object.position.y = ambiente.getYat(object.position) + altura;
+			mesh.position.add(dist);
+			mesh.position.y = ambiente.getYat(mesh.position) + altura;
 			return true;
 		}
 	}

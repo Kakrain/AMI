@@ -20,6 +20,9 @@
 		<script src="js/Raycaster.js"></script>
 		<script src="js/Clock.js"></script>
 		<script src="js/AmbienteMatico.js"></script>
+		<script src="js/jdataview.js"></script>
+		<script src="js/mm3d.js"></script>
+		<script src="js/BodyMatico.js"></script>
 		<script src="js/Weapon.js"></script>
 		<script src="js/Actor.js"></script>
 		<script>
@@ -31,8 +34,8 @@
 				renderer.shadowMapEnabled = true;
 			var clock = new THREE.Clock(true);
 			var dt = clock.getDelta();
-			// var allies      = [];
-			// var enemies = [];
+			 var allies = [];
+			 var enemies = [];
 
 			var interface1 = new Interfaz (camera,scene);
 			var ambiente  = new ambienteMatico(scene);	
@@ -47,13 +50,52 @@
 				ambiente.setMar("img/map/water512.jpg");
 				ambiente.generate();	
 
+
+
+var halberdierMatico=new BodyMatico("models/halberdier.mm3d","img/textures/halberdier.png",scene);
+var halberdMatico=new WeaponMatico("models/halberd.mm3d","img/textures/halberd.jpg");
+var halberdier=null;
+var boxes=null;
+var mesh=null;
+
+/*
+		var worker = new Worker('js/worker.js');
+		worker.postMessage("marco");//usar al worker
+		worker.addEventListener('message', function(e) {
+		  if(!halberdierMatico.isReady()&&!halberdMatico.isReady()){
+		  	worker.postMessage("marco");
+		  }else{
+			worker.terminate();
+			var weapon=new Weapon(30,2,1);
+			var enemy=new Actor (halberdierMatico.generate(),scene,ambiente,allies,enemies);
+			enemy.setPosition(60,-50,60);
+			//enemy.setAzimut(Math.PI/2);
+			enemy.addArma(weapon,halberdMatico.generate());
+			enemy.addPatrolPosition(new THREE.Vector3(10,0,10));
+			enemy.addPatrolPosition(new THREE.Vector3(-10,0,10));
+			enemy.addPatrolPosition(new THREE.Vector3(10,0,-10));
+			var ally=new Actor (halberdierMatico.generate(),scene,ambiente,enemies,allies);
+			ally.setPosition(-60,-50,60);
+			ally.addArma(weapon.clone(),halberdMatico.generate());
+		  }
+		}, false);
+*/
+//createSphere(60,-50,60,'blue');
+//createSphere(-60,-50,60,'blue');
+
+
+
+
+
+
+
 			var render = function () {
 				requestAnimationFrame(render);				
 				camera.fov = 75;
   				camera.updateProjectionMatrix();
 				interface1.update();
 				dt = clock.getDelta();
-				/*if(interface1.enabled() && enemy.animar!=null){
+				/*if(interface1.enabled()){
 					 for (var i=0; i<enemies.length; i++) { 
 					 	enemies[i].animar(dt);
 					 }
