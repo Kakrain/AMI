@@ -19,7 +19,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -27,20 +29,21 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.w3c.dom.Text;
+
 import java.net.URISyntaxException;
 
 
 public class main extends Activity implements SensorEventListener {
 
     Socket socket;
-    LinearLayout layout;
-    TableLayout table;
-    TextView tap;
-    Boolean playing = false;
+    TableLayout controls;
+    Switch onoff;
+    TextView message;
+    Boolean screenTouched = false;
     Button b11, b12, b13, b21, b22, b23, b31, b32, b33;
 
     private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
     private float mLastX, mLastY, mLastZ;
     boolean mInitialized = false;
     private final float NOISE = (float) 18.0;
@@ -58,8 +61,9 @@ public class main extends Activity implements SensorEventListener {
         final Animation fadeIn = AnimationUtils.loadAnimation(this,R.anim.fade_in);
         final Animation fadeOut = AnimationUtils.loadAnimation(this,R.anim.fade_out);
 
-        tap = (TextView) findViewById(R.id.tap);
-        table = (TableLayout) findViewById(R.id.table);
+        controls = (TableLayout) findViewById(R.id.controls);
+        onoff = (Switch) findViewById(R.id.onoff);
+        message = (TextView) findViewById(R.id.message);
         b11 = (Button) findViewById(R.id.b11);
         b12 = (Button) findViewById(R.id.b12);
         b13 = (Button) findViewById(R.id.b13);
@@ -72,26 +76,31 @@ public class main extends Activity implements SensorEventListener {
 
         socketIOSetUp();
 
-        layout = (LinearLayout) findViewById(R.id.linearlayout);
-        layout.setOnClickListener(new View.OnClickListener() {
+        controls.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                if (socket.connected()) {
-                    if (!playing) {
-                        socket.emit("enable-game");
-                        tap.startAnimation(fadeOut);
-                        tap.setVisibility(View.GONE);
-                        table.startAnimation(fadeIn);
-                        table.setVisibility(View.VISIBLE);
-                        playing = true;
-                    } else {
-                        socket.emit("disable-game");
-                        table.startAnimation(fadeOut);
-                        table.setVisibility(View.GONE);
-                        tap.startAnimation(fadeIn);
-                        tap.setVisibility(View.VISIBLE);
-                        playing = false;
-                    }
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    screenTouched = true;
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    screenTouched = false;
+                }
+                return false;
+            }
+        });
+        onoff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isOn) {
+                if (isOn) {
+                    socket.emit("enable-game");
+                    message.startAnimation(fadeOut);
+                    message.setVisibility(View.GONE);
+                    controls.startAnimation(fadeIn);
+                    controls.setVisibility(View.VISIBLE);
+                } else {
+                    socket.emit("disable-game");
+                    controls.startAnimation(fadeOut);
+                    controls.setVisibility(View.GONE);
+                    message.startAnimation(fadeIn);
+                    message.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -142,13 +151,11 @@ public class main extends Activity implements SensorEventListener {
         });
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void socketIOSetUp(){
         try {
-            socket = IO.socket("http://192.168.0.2:3000");
+            socket = IO.socket("http://192.168.137.150:3000");
         } catch (URISyntaxException e) { e.printStackTrace(); }
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
@@ -168,31 +175,44 @@ public class main extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
-        if (!mInitialized) {
-            mLastX = x;
-            mLastY = y;
-            mLastZ = z;
-            mInitialized = true;
-        } else {
-            float deltaX = Math.abs(mLastX - x);
-            float deltaY = Math.abs(mLastY - y);
-            float deltaZ = Math.abs(mLastZ - z);
-            if (deltaX < NOISE) deltaX = (float)0.0;
-            if (deltaY < NOISE) deltaY = (float)0.0;
-            if (deltaZ < NOISE) deltaZ = (float)0.0;
-            mLastX = x;
-            mLastY = y;
-            mLastZ = z;
-            if (deltaX > deltaY) {
-                if(socket.connected())
-                    socket.emit("attack");
-            }
-            if (deltaZ > deltaY) {
-                if (socket.connected())
-                    socket.emit("block");
+        synchronized (this) {
+            switch (event.sensor.getType()){
+                case Sensor.TYPE_ACCELEROMETER:
+                    float x = event.values[0];
+                    float y = event.values[1];
+                    float z = event.values[2];
+                    if (!mInitialized) {
+                        mLastX = x;
+                        mLastY = y;
+                        mLastZ = z;
+                        mInitialized = true;
+                    } else {
+                        float deltaX = Math.abs(mLastX - x);
+                        float deltaY = Math.abs(mLastY - y);
+                        float deltaZ = Math.abs(mLastZ - z);
+                        if (deltaX < NOISE) deltaX = (float)0.0;
+                        if (deltaY < NOISE) deltaY = (float)0.0;
+                        if (deltaZ < NOISE) deltaZ = (float)0.0;
+                        mLastX = x;
+                        mLastY = y;
+                        mLastZ = z;
+                        if (deltaX > deltaY) {
+                            if(socket.connected())
+                                socket.emit("attack");
+                        }
+                        if (deltaZ > deltaY) {
+                            if (socket.connected())
+                                socket.emit("block");
+                        }
+                    }
+                    break;
+                case Sensor.TYPE_GYROSCOPE:
+                    if(screenTouched) {
+                        System.out.println("x:" + Float.toString(event.values[0]));
+                        System.out.println("y:" + Float.toString(event.values[1]));
+                        System.out.println("z:" + Float.toString(event.values[2]));
+                    }
+                    break;
             }
         }
     }
@@ -200,14 +220,24 @@ public class main extends Activity implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {}
 
+    @Override
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), mSensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), mSensorManager.SENSOR_DELAY_NORMAL);
     }
 
     protected void onPause() {
         super.onPause();
-        mSensorManager.unregisterListener(this);
+        mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+        mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+        mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE));
     }
 
     @Override

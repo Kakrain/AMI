@@ -44,12 +44,12 @@ function Interfaz (camera,scene) {
 			instructions.style.transform="translate(-50%, -50%)";
 			instructions.style.color="#FFFFFF";
 		var span = document.createElement('span');
-			span.innerHTML="Tap para jugar";
+			span.innerHTML="Activa para jugar";
 			span.style.fontSize="40px";
 		var br = document.createElement('br');
 		instructions.appendChild(span);
 		instructions.appendChild(br);
-		instructions.innerHTML+="(Presiona la pantalla de tu dispositivo)";
+		instructions.innerHTML+="(Mueve el switch de tu dispositivo)";
 		blocker.appendChild(instructions);
 		document.body.insertBefore(blocker, document.body.firstChild);
 	}
