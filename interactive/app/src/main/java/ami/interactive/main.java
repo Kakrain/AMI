@@ -33,20 +33,31 @@ import org.w3c.dom.Text;
 
 import java.net.URISyntaxException;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnCheckedChanged;
+import butterknife.OnTouch;
+
 
 public class main extends Activity implements SensorEventListener {
 
-    Socket socket;
-    TableLayout controls;
-    Switch onoff;
-    TextView message;
-    Boolean screenTouched = false;
-    Button b11, b12, b13, b21, b22, b23, b31, b32, b33;
+    @InjectView(R.id.controls) TableLayout controls;
+    @InjectView(R.id.message)  TextView message;
+    @InjectView(R.id.onoff)    Switch onoff;
+    @InjectView(R.id.b12)      Button b12;
+    @InjectView(R.id.b21)      Button b21;
+    @InjectView(R.id.b22)      Button b22;
+    @InjectView(R.id.b23)      Button b23;
+    @InjectView(R.id.b32)      Button b32;
 
-    private SensorManager mSensorManager;
-    private float mLastX, mLastY, mLastZ;
+    Socket socket;
+    Boolean moveCamera = false;
+    SensorManager mSensorManager;
+    float mLastX, mLastY, mLastZ;
     boolean mInitialized = false;
-    private final float NOISE = (float) 18.0;
+    final float NOISE = (float) 18.0;
+    Animation fadeIn = null;
+    Animation fadeOut = null;
 
 
     @Override
@@ -58,118 +69,63 @@ public class main extends Activity implements SensorEventListener {
 
         setContentView(R.layout.main);
 
-        final Animation fadeIn = AnimationUtils.loadAnimation(this,R.anim.fade_in);
-        final Animation fadeOut = AnimationUtils.loadAnimation(this,R.anim.fade_out);
+        fadeIn = AnimationUtils.loadAnimation(this,R.anim.fade_in);
+        fadeOut = AnimationUtils.loadAnimation(this,R.anim.fade_out);
 
-        controls = (TableLayout) findViewById(R.id.controls);
-        onoff = (Switch) findViewById(R.id.onoff);
-        message = (TextView) findViewById(R.id.message);
-        b11 = (Button) findViewById(R.id.b11);
-        b12 = (Button) findViewById(R.id.b12);
-        b13 = (Button) findViewById(R.id.b13);
-        b21 = (Button) findViewById(R.id.b21);
-        b22 = (Button) findViewById(R.id.b22);
-        b23 = (Button) findViewById(R.id.b23);
-        b31 = (Button) findViewById(R.id.b31);
-        b32 = (Button) findViewById(R.id.b32);
-        b33 = (Button) findViewById(R.id.b33);
-
+        ButterKnife.inject(this);
         socketIOSetUp();
 
-        controls.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    screenTouched = true;
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    screenTouched = false;
-                }
-                return false;
-            }
-        });
-        onoff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isOn) {
-                if (isOn) {
-                    socket.emit("enable-game");
-                    message.startAnimation(fadeOut);
-                    message.setVisibility(View.GONE);
-                    controls.startAnimation(fadeIn);
-                    controls.setVisibility(View.VISIBLE);
-                } else {
-                    socket.emit("disable-game");
-                    controls.startAnimation(fadeOut);
-                    controls.setVisibility(View.GONE);
-                    message.startAnimation(fadeIn);
-                    message.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        b12.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    socket.emit("b12-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    socket.emit("b12-up");
-                }
-                return false;
-            }
-        });
-        b21.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    socket.emit("b21-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    socket.emit("b21-up");
-                }
-                return false;
-            }
-        });
-        b23.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    socket.emit("b23-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    socket.emit("b23-up");
-                }
-                return false;
-            }
-        });
-        b32.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    socket.emit("b32-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    socket.emit("b32-up");
-                }
-                return false;
-            }
-        });
-
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+    }
+
+    @OnCheckedChanged(R.id.onoff)
+    public void switchAction(boolean isOn){
+        if (isOn) {
+            socket.emit("enable-game");
+            message.startAnimation(fadeOut);
+            message.setVisibility(View.GONE);
+            controls.startAnimation(fadeIn);
+            controls.setVisibility(View.VISIBLE);
+        } else {
+            socket.emit("disable-game");
+            controls.startAnimation(fadeOut);
+            controls.setVisibility(View.GONE);
+            message.startAnimation(fadeIn);
+            message.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @OnTouch({R.id.b12, R.id.b21, R.id.b22, R.id.b23, R.id.b32})
+    public boolean move(Button button, MotionEvent motionEvent){
+        switch(button.getId()){
+            case R.id.b12:
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) { socket.emit("b12-down"); }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { socket.emit("b12-up"); }
+                break;
+            case R.id.b21:
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) { socket.emit("b21-down"); }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { socket.emit("b21-up"); }
+                break;
+            case R.id.b22:
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) { moveCamera = true; }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { moveCamera = false; }
+                break;
+            case R.id.b23:
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) { socket.emit("b23-down"); }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { socket.emit("b23-up"); }
+                break;
+            case R.id.b32:
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) { socket.emit("b32-down"); }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { socket.emit("b32-up"); }
+                break;
+        }
+        return true;
     }
 
     public void socketIOSetUp(){
         try {
             socket = IO.socket("http://192.168.137.150:3000");
         } catch (URISyntaxException e) { e.printStackTrace(); }
-        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-            }
-        }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-            }
-        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-            }
-        });
         socket.connect();
     }
 
@@ -207,7 +163,7 @@ public class main extends Activity implements SensorEventListener {
                     }
                     break;
                 case Sensor.TYPE_GYROSCOPE:
-                    if(screenTouched) {
+                    if(moveCamera) {
                         System.out.println("x:" + Float.toString(event.values[0]));
                         System.out.println("y:" + Float.toString(event.values[1]));
                         System.out.println("z:" + Float.toString(event.values[2]));
@@ -238,6 +194,12 @@ public class main extends Activity implements SensorEventListener {
         super.onStop();
         mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
         mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE));
+    }
+
+    @Override
+    protected  void onDestroy(){
+        super.onDestroy();
+        ButterKnife.reset(this);
     }
 
     @Override
