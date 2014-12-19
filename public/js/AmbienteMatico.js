@@ -14,7 +14,9 @@ function ambienteMatico(_scene){
 		width           = 1000,
 		height          = 1000,
 		offSetY        = 1,
-		Placas         = [];
+		Placas         = [],
+		raycaster =  new THREE.Raycaster(),
+		intersects;
 
 	this.getWidth = function(){
 		return width;
@@ -197,22 +199,23 @@ function ambienteMatico(_scene){
 				water.position.y =altura+nivelMar;
 			scene.add(water);
 		}
+		var paso=120;
+		var y=10;
+		var i,j;
 	}
 
 	function generateRustico(){
 		var geometry = new THREE.PlaneGeometry(width,height,img.width-1,img.height-1);
-		var texture = THREE.ImageUtils.loadTexture(heightmapUrl);
-		var material = new THREE.MeshLambertMaterial( { map: texture } );
+		var material = new THREE.MeshLambertMaterial( { color:'white' ,transparent:true, opacity:0.0} );
 		planeFisico = new THREE.Mesh( geometry, material );
 		for (var i=0; i<planeFisico.geometry.vertices.length; i++) {
 			planeFisico.geometry.vertices[i].z = HeightData[i]*3;
 		}
 		planeFisico.rotation.x = -Math.PI / 2;
 		planeFisico.position.y = altura+offSetY;
-		planeFisico.material.side = THREE.DoubleSide;
-		planeFisico.material.opacity = 0.5;
-		planeFisico.material.transparent = true;
-		scene.add(planeFisico);
+		//planeFisico.material.side = THREE.DoubleSide;
+		scene.add(planeFisico);//si no se dibuja, no funciona
+		scene.updateMatrixWorld();//es importante
 	}
 	
 	this.drawRustico = function(){
@@ -220,7 +223,7 @@ function ambienteMatico(_scene){
 	}
 
 	function createSphere(x,y,z,color){
-		var sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5), new THREE.MeshPhongMaterial({color: color}) );
+		var sphere = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshPhongMaterial({color: color}) );
 			sphere.position.x = x;
 			sphere.position.y = y;
 			sphere.position.z = z;
@@ -234,7 +237,27 @@ function ambienteMatico(_scene){
 		return v;
 	}
 	
-	var getYat = function(v){
+	var getYat=function(v){
+		var y=v.y;
+		
+			raycaster.set(v, new THREE.Vector3(0,-1,0));
+		 	intersects = raycaster.intersectObject(planeFisico);
+			if(intersects.length!=0){
+				//$.notify("intersecta");
+				y=intersects[0].point.y;
+			}else{
+				raycaster.set(v, new THREE.Vector3(0,1,0));
+				intersects = raycaster.intersectObject(planeFisico);
+				if(intersects.length!=0){
+				//$.notify("intersecta");
+				y=intersects[0].point.y;
+				}else{
+					//$.notify("fallo",{autoHide: false});
+				}
+			}
+			return y;
+	}
+	var getYatOld = function(v){
 		var init = realPositionAt(0);
 		var vectors = [];
 		var ixf,izf,ixc,izc;

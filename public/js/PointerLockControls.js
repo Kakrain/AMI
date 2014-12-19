@@ -11,35 +11,29 @@ THREE.PointerLockControls = function ( camera ) {
 			altura       = 20;
 	camera.rotation.set( 0, 0, 0 );
 	pitchObject.add( camera );
-
-	var yawObject = new THREE.Object3D();
-		yawObject.add( pitchObject );
-		yawObject.position.x = 0.01;
-		yawObject.position.z = 0.0;
-		yawObject.position.z = 0.01;
-
-	this.moveForward   = false;
-	this.moveBackward = false;
-	this.moveLeft          = false;
-	this.moveRight        = false;
+	var moveForward   = false;
+	var moveBackward = false;
+	var moveLeft          = false;
+	var moveRight        = false;
 
 	var isOnObject = false;
 	var canJump    = false;
 	var prevTime    = performance.now();
 	var velocity      = new THREE.Vector3();
 	var PI_2          = Math.PI / 2;
-	
+	camera.rotation.order = "YXZ";
 	this.setAmbiente = function(_ambiente){
 		Ambiente = _ambiente;
 	}
 	
 	var onMouseMove = function ( event ) {
 		if ( scope.enabled === false ) return;
+		var k=0.002;
 			var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 			var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-			yawObject.rotation.y -= movementX * 0.002;
-			pitchObject.rotation.x -= movementY * 0.002;
-			pitchObject.rotation.x = Math.max( - PI_2, Math.min( PI_2, pitchObject.rotation.x ) );
+			camera.rotation.y-= k*movementX;
+			camera.rotation.x-= k*movementY;
+			camera.rotation.x=Math.max(Math.min(camera.rotation.x,Math.PI/2),-Math.PI/2);
 	};
 	
 	this.disable = function(){
@@ -58,19 +52,19 @@ THREE.PointerLockControls = function ( camera ) {
 		switch ( event.keyCode ) {
 			case 38: // up
 			case 87: // w
-				this.moveForward = true;
+				moveForward = true;
 				break;
 			case 37: // left
 			case 65: // a
-				this.moveLeft = true; 
+				moveLeft = true; 
 				break;
 			case 40: // down
 			case 83: // s
-				this.moveBackward = true;
+				moveBackward = true;
 				break;
 			case 39: // right
 			case 68: // d
-				this.moveRight = true;
+				moveRight = true;
 				break;
 			case 32: // space
 				if (canJump === true ) velocity.y += altura*12;//velocity.y += 350;
@@ -83,19 +77,19 @@ THREE.PointerLockControls = function ( camera ) {
 		switch( event.keyCode ) {
 			case 38: // up
 			case 87: // w
-				this.moveForward = false;
+				moveForward = false;
 				break;
 			case 37: // left
 			case 65: // a
-				this.moveLeft = false;
+				moveLeft = false;
 				break;
 			case 40: // down
 			case 83: // s
-				this.moveBackward = false;
+				moveBackward = false;
 				break;
 			case 39: // right
 			case 68: // d
-				this.moveRight = false;
+				moveRight = false;
 				break;
 		}
 	};
@@ -106,69 +100,63 @@ THREE.PointerLockControls = function ( camera ) {
 	
 	this.enabled = false;
 
-	this.getObject = function () {
-		return yawObject;
-	};
-
 	this.isOnObject = function ( boolean ) {
 		isOnObject = boolean;
 		canJump = boolean;
 	};
-
-	this.getDirection = function() {
-		var direction = new THREE.Vector3( 0, 0, -1 );
-		var rotation = new THREE.Euler( 0, 0, 0, "YXZ" );
-		return function(v) {
-			rotation.set( pitchObject.rotation.x, yawObject.rotation.y, 0 );
-			v.copy( direction ).applyEuler( rotation );
-			return v;
-		}
-	}();
-
 	this.update = function () {
 		var time = performance.now();
 		var delta = ( time - prevTime ) / 1000;
 		if(scope.enabled){
-			velocity.x -= velocity.x * 10.0 * delta;
-			velocity.z -= velocity.z * 10.0 * delta;
 			velocity.y -= 9.8 * altura*3 * delta;
-			var vel = altura*100;
-			if ( this.moveForward ) velocity.z -= vel * delta;
-			if ( this.moveBackward ) velocity.z += vel * delta;
-			if ( this.moveLeft ) velocity.x -= vel * delta;
-			if ( this.moveRight ) velocity.x += vel * delta;
-			if (isOnObject === true ) {
+			var vel = altura*10;
+					var vector = new THREE.Vector3( 0, 0, -1 );
+					vector.applyQuaternion( camera.quaternion );
+					if (moveForward) { //38 up key
+					camera.position.x+=vel*vector.x*delta;
+					camera.position.z+=vel*vector.z*delta;
+				    } else if (moveBackward) { 
+					camera.position.x-=vel*vector.x*delta;
+					camera.position.z-=vel*vector.z*delta;
+				    } 
+				    vector = new THREE.Vector3( 1, 0,0);
+					vector.applyQuaternion( camera.quaternion );
+				    if (moveRight) { //39 right key
+					camera.position.x+=vel*vector.x*delta;
+					camera.position.z+=vel*vector.z*delta;
+				    } else if (moveLeft) { //37 left key
+					camera.position.x-=vel*vector.x*delta;
+					camera.position.z-=vel*vector.z*delta;
+				    }
+if (isOnObject === true ) {
 				velocity.y = Math.max( 0, velocity.y );
 			}
-			yawObject.translateX( velocity.x * delta );
-			yawObject.translateY( velocity.y * delta ); 
-			yawObject.translateZ( velocity.z * delta );
+camera.position.y+=velocity.y * delta;
+
 			if(Ambiente != null){
-				if(yawObject.position.x > (Ambiente.getWidth()/2-10)){
-					yawObject.position.x = (Ambiente.getWidth()/2-10);
+				if(camera.position.x > (Ambiente.getWidth()/2-10)){
+					camera.position.x = (Ambiente.getWidth()/2-10);
 				}else{
-					if(yawObject.position.x < -(Ambiente.getWidth()/2-10)){
-						yawObject.position.x = -(Ambiente.getWidth()/2-10);
+					if(camera.position.x < -(Ambiente.getWidth()/2-10)){
+						camera.position.x = -(Ambiente.getWidth()/2-10);
 					}
 				}
-				if(yawObject.position.z > (Ambiente.getHeight()/2-10)){
-					yawObject.position.z = (Ambiente.getHeight()/2-10);
+				if(camera.position.z > (Ambiente.getHeight()/2-10)){
+					camera.position.z = (Ambiente.getHeight()/2-10);
 				}else{
-					if(yawObject.position.z < -(Ambiente.getHeight()/2-10)){
-					yawObject.position.z = -(Ambiente.getHeight()/2-10);
+					if(camera.position.z < -(Ambiente.getHeight()/2-10)){
+					camera.position.z = -(Ambiente.getHeight()/2-10);
 					}
 				}
 			}
-			var posy = altura + ((Ambiente != null)?(Ambiente.getYat(yawObject.position)):0);
-			if ( yawObject.position.y < posy ) {
+			var posy = altura + ((Ambiente != null)?(Ambiente.getYat(camera.position)):0);
+			if ( camera.position.y < posy ) {
 				velocity.y = 0;
-				yawObject.position.y = posy;
+				camera.position.y = posy;
 				canJump = true;
 			}
 		}
 		prevTime = time;
 	};
 	
-	onKeyDown(38);
-	onKeyUp(38);
 };

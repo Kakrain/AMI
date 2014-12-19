@@ -57,52 +57,29 @@ var halberdMatico=new WeaponMatico("models/halberd.mm3d","img/textures/halberd.j
 var halberdier=null;
 var boxes=null;
 var mesh=null;
+var enemy,ally,weapon;
+//loadHalberdiers();
+		
 
-/*
-		var worker = new Worker('js/worker.js');
-		worker.postMessage("marco");//usar al worker
-		worker.addEventListener('message', function(e) {
-		  if(!halberdierMatico.isReady()&&!halberdMatico.isReady()){
-		  	worker.postMessage("marco");
-		  }else{
-			worker.terminate();
-			var weapon=new Weapon(30,2,1);
-			var enemy=new Actor (halberdierMatico.generate(),scene,ambiente,allies,enemies);
-			enemy.setPosition(60,-50,60);
-			//enemy.setAzimut(Math.PI/2);
-			enemy.addArma(weapon,halberdMatico.generate());
-			enemy.addPatrolPosition(new THREE.Vector3(10,0,10));
-			enemy.addPatrolPosition(new THREE.Vector3(-10,0,10));
-			enemy.addPatrolPosition(new THREE.Vector3(10,0,-10));
-			var ally=new Actor (halberdierMatico.generate(),scene,ambiente,enemies,allies);
-			ally.setPosition(-60,-50,60);
-			ally.addArma(weapon.clone(),halberdMatico.generate());
-		  }
-		}, false);
-*/
 //createSphere(60,-50,60,'blue');
 //createSphere(-60,-50,60,'blue');
-
-
-
-
-
-
-
 			var render = function () {
 				requestAnimationFrame(render);				
 				camera.fov = 75;
   				camera.updateProjectionMatrix();
 				interface1.update();
 				dt = clock.getDelta();
-				/*if(interface1.enabled()){
+
+	
+				if(interface1.enabled()){
+					THREE.AnimationHandler.update(dt);
 					 for (var i=0; i<enemies.length; i++) { 
 					 	enemies[i].animar(dt);
 					 }
 					 for (var i=0; i < allies.length; i++) { 
 					 	allies[i].animar(dt);
 					 }
-				}*/
+				}
 				renderer.render(scene, camera);
 			};
 
@@ -112,6 +89,44 @@ var mesh=null;
 			setSun(scene);
 			setSpot(scene);			
 			render();
+
+
+
+			function loadHalberdiers(){
+				var worker = new Worker('js/worker.js');
+				worker.postMessage("marco");//usar al worker
+				worker.addEventListener('message', function(e) {
+				  if(!halberdierMatico.isReady()&&!halberdMatico.isReady()){
+				  	$.notify("marco");
+				  	worker.postMessage("marco");
+				  }else{
+				  	try{
+				  		//$.notify("bastardo no es null");//no pasa por aqui cuando falla...tal ves al de arriba cambia de puntero
+				  		
+						worker.terminate();
+						weapon=new Weapon(30,10,1);
+						enemy=new Actor (halberdierMatico.generate(),scene,ambiente,allies,enemies);
+						enemies[enemies.length]=enemy;
+						enemy.setPosition(60,-50,60);
+						
+						enemy.setAzimut(Math.PI/2);
+						enemy.addArma(weapon,halberdMatico.generate());
+						/*enemy.addPatrolPosition(new THREE.Vector3(10,0,10));
+						enemy.addPatrolPosition(new THREE.Vector3(-10,0,10));
+						enemy.addPatrolPosition(new THREE.Vector3(10,0,-10));*/
+						ally=new Actor (halberdierMatico.generate(),scene,ambiente,enemies,allies);
+						allies[allies.length]=ally;
+						ally.setPosition(-60,-50,60);
+						ally.addArma(weapon.clone(),halberdMatico.generate());
+				  	}catch(err){
+				  		loadHalberdiers();
+				  		$.notify("erro una vez");
+				  		}
+				  	//$.notify("esta cargado correcto: "+halberdierMatico.loadedCorrectly());
+					
+				  }
+				}, false);
+			}
 	</script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="js/socketHandler.js"></script>

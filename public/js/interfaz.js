@@ -6,8 +6,8 @@ function Interfaz (camera,scene) {
 		 instructions            = document.createElement('div'),
 	     blocker                  = document.createElement('div'), 
 	     controls                 = new THREE.PointerLockControls( camera );
-	scene.add( controls.getObject() );
-
+	//scene.add( controls.getObject() );
+scene.add(camera);
 	this.setAmbiente = function(ambiente){
 		controls.setAmbiente(ambiente);
 	}
