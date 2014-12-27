@@ -124,7 +124,7 @@ public class main extends Activity implements SensorEventListener {
 
     public void socketIOSetUp(){
         try {
-            socket = IO.socket("http://192.168.137.150:3000");
+            socket = IO.socket("http://192.168.0.5:3000");
         } catch (URISyntaxException e) { e.printStackTrace(); }
         socket.connect();
     }
@@ -179,8 +179,8 @@ public class main extends Activity implements SensorEventListener {
     @Override
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), mSensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), mSensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), mSensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), mSensorManager.SENSOR_DELAY_GAME);
     }
 
     protected void onPause() {

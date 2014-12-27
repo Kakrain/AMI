@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>El Camino del Inca</title>
+		<meta charset="UTF-8">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script>
+			$(document).ready(function(){
+				var user, password;
+				$("#submit").click(function(){
+					user = $("#user").val();
+					password = $("#password").val();
+					$.post("http://localhost:3000/login",{user:user,password:password},function(data){        
+						if(data==='ok'){
+							window.location.href="/game";
+						}
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+			<label>Usuario:</label><br>
+			<input type="text" name="user" id="user"></i><br>
+			<label>Contraseña:</label><br>
+			<input type="text" name="password" id="password"><br>
+			<a href="/login"><input type="submit" id="submit" value="Ingresar"></a>
+	</body>
+</html>

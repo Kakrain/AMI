@@ -12,6 +12,17 @@ conn.on('disconnect', function(){
 	console.log('user disconnected');
 });
 
+conn.on('gyroscope-x', function(gValue){
+	console.log('Coord-x: ' + gValue);
+});
+conn.on('gyroscope-y', function(gValue){
+	console.log('Coord-y: ' + gValue);
+});
+conn.on('gyroscope-z', function(gValue){
+	console.log('Coord-z: ' + gValue);
+});
+
+
 conn.on('b12-down', function(msg){
 	interface1.b12Down();
 	console.log(msg);
