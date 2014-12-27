@@ -8,6 +8,11 @@ var io = require('socket.io')(http);
 var path = require('path');
 var bodyParser = require('body-parser');
 var database = require('./config/database.js');
+var passport = require('passport');
+var flash = require('connect-flash');
+var morgan = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 var port = process.env.PORT || 3000;
 var sess;
 
@@ -17,13 +22,13 @@ database.init();
 //database.validateUser('DenkSchuldt','lalala');
 
 // Configurations
-//app.use(morgan('dev')); // log every request to the console
-//app.use(cookieParser()); // read cookies (needed for auth)
-//app.use(bodyParser.json()); // get information from html forms
-//app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan('dev')); // log every request to the console
+app.use(cookieParser()); // read cookies (needed for auth)
+app.use(bodyParser.json()); // get information from html forms
+app.use(bodyParser.urlencoded({ extended: true }));
 app.engine('.html', require('ejs').__express);
 app.use(express.static(path.join(__dirname, 'views')));    
-/*app.use(session({
+app.use(session({
     secret: 'elcaminodelincarocks',
     name: 'Inca',
     proxy: true,
@@ -34,32 +39,7 @@ app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session*/
 
-app.get('/', function(req, res){
-	sess = req.session;
-	if(!sess.user) {
-		res.redirect('/game');
-	} else {
-		res.sendfile('index.html');
-	}
-});
-
-app.get('/login',function(req,res){
-	sess = req.session;
-	console.log(req);
-	sess.user = req.body.user;
-	sess.password = req.body.password;
-	res.redirect('/game');
-});
-
-app.get('/logout',function(req,res){
-	req.session.destroy(function(err){
-		if(err){
-			console.log(err);
-		} else {
-			res.redirect('/');
-		}
-	});
-});
+require('./config/passport')(passport);
 
 io.on('connection', function(socket){
 	console.log("User connected");
@@ -98,6 +78,8 @@ io.on('connection', function(socket){
 	});
 });
 
+require('./config/routes.js')(app, passport);
+
 http.listen(port, function(){
-	console.log('listening on *: ' + port);
+	console.log('Listening on *: ' + port);
 });
