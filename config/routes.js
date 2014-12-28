@@ -32,6 +32,12 @@ module.exports = function(app, passport) {
         successRedirect : '/game',
 		failureRedirect : '/'
 	}));
+	
+	app.get('/auth/twitter', passport.authenticate('twitter'));
+    app.get('/auth/twitter/callback', passport.authenticate('twitter', {
+		successRedirect : '/game',
+		failureRedirect : '/'
+    }));
 		
 	app.get('/logout', function(req, res) {
         req.logout();
