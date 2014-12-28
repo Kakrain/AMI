@@ -1,9 +1,0 @@
-CREATE TABLE users (
-	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	uname VARCHAR(20) NOT NULL,
-	ulastname VARCHAR(20) NOT NULL,
-	uemail VARCHAR(35) NOT NULL,
-	username VARCHAR(20) NOT NULL,
-	upassword VARCHAR(20) NOT NULL,
-	ubirthday date NOT NULL
-);
