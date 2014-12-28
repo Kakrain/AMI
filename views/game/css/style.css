@@ -8,3 +8,10 @@ body {
 	overflow: hidden;
 	font-family: arial;
 }
+.logout {
+	position: fixed;
+	text-decoration: none;
+	top: 30px;
+	right: 30px;
+	color:white
+}

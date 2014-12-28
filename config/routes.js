@@ -1,12 +1,13 @@
 
 module.exports = function(app, passport) {
-
+	
     app.get('/', function(req, res) {
         res.render('index.html');
     });
 
-	
     app.get('/login', function(req, res) {
+		if (req.isAuthenticated())
+			res.redirect('/game');
         res.render('login.html', { message: req.flash('loginMessage') });
     });
 	app.post('/login', passport.authenticate('local-login', {
@@ -14,9 +15,10 @@ module.exports = function(app, passport) {
         failureRedirect : '/login',
         failureFlash : true
     }));
-
 	
     app.get('/signup', function(req, res) {
+		if (req.isAuthenticated())	
+			res.redirect('/game');
         res.render('signup.html', { message: req.flash('signupMessage') });
     });
 	app.post('/signup', passport.authenticate('local-signup', {
@@ -24,22 +26,21 @@ module.exports = function(app, passport) {
         failureRedirect : '/signup',
         failureFlash : true
     }));
-
 	
-    app.get('/game', isLoggedIn, function(req, res) {
-		res.redirect('/game');
-		res.render('index.html',{ user : req.user });
-    });
-
-    app.get('/logout', function(req, res) {
+	app.get('/auth/facebook', passport.authenticate('facebook', { scope : 'email' }));
+    app.get('/auth/facebook/callback', passport.authenticate('facebook', {
+        successRedirect : '/game',
+		failureRedirect : '/'
+	}));
+		
+	app.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/');
     });
 };
 
-
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated())
-        return next();
+        next();
     res.redirect('/');
 }

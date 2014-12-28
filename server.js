@@ -21,12 +21,12 @@ mongoose.connect(database.url);
 require('./config/passport')(passport);
 
 // Configurations
-app.use(morgan('dev')); // log every request to the console
-app.use(cookieParser()); // read cookies (needed for auth)
-app.use(bodyParser.json()); // get information from html forms
+app.use(morgan('dev'));
+app.use(cookieParser());
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.engine('.html', require('ejs').__express);
-app.use(express.static(path.join(__dirname, 'views')));    
+app.use(express.static(path.join(__dirname, 'views')));
 app.use(session({
     secret: 'elcaminodelincarocks',
     name: 'mongodb',
@@ -35,11 +35,10 @@ app.use(session({
     saveUninitialized: true
 }));
 app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
-app.use(flash()); // use connect-flash for flash messages stored in session*/
+app.use(passport.session());
+app.use(flash());
 
 require('./config/socketio')(io);
-
 require('./config/routes.js')(app, passport);
 
 http.listen(port, function(){
