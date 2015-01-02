@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>El Camino del Inca > C&oacute;digo</title>
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+		<style>
+			body { padding-top:80px; background-color:#D9D9D9;}
+			#code{ display:block;text-align:center;font-size:10em;margin:50px 0;color:#A4C639; }
+			nav { position: fixed;top: 15px;right: 30px; }
+			nav ul { list-style-type: none }
+			nav ul li { display:inline-block }
+			nav ul #username { border-right: 2px solid #A4C639 }
+			nav ul li a { padding: 10px;color:black;text-decoration: none; }
+		</style>
+	</head>
+	<body>
+		<nav>
+			<ul>
+				<li><a href="#" id="username"><%= username %></a></li>
+				<li><a href="/logout">Salir</a></li>
+			</ul>
+		</nav>
+		<div class="container">
+			<div class="col-sm-8 col-sm-offset-2">
+				<h1><span class="fa fa-android"></span> Ingresa el siguiente código en tu celular:</h1>
+				<% if (message.length > 0) { %>
+					<span id="code"><%= message %></span>
+				<% } %>
+			</div>
+		</div>
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			var conn = io();
+			conn.emit('temporal-web',document.getElementById("code").html);
+			conn.on('match-correct', function(code){
+				if(code === document.getElementById("code").html){
+					var href = window.location.href;
+					href = href.substr(0,href.indexOf('/'));
+					href = href + "/private?code=" + code;
+					window.location.href = href;
+				}
+			});	
+		</script>
+	</body>
+</html>

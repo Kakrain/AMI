@@ -6,8 +6,9 @@ function Interfaz (camera,scene) {
 		 instructions            = document.createElement('div'),
 	     blocker                  = document.createElement('div'), 
 	     controls                 = new THREE.PointerLockControls( camera );
+	
 	//scene.add( controls.getObject() );
-scene.add(camera);
+	scene.add(camera);
 	this.setAmbiente = function(ambiente){
 		controls.setAmbiente(ambiente);
 	}
@@ -51,12 +52,6 @@ scene.add(camera);
 		instructions.appendChild(br);
 		instructions.innerHTML+="(Mueve el switch de tu dispositivo)";
 		blocker.appendChild(instructions);
-		
-		var a = document.createElement('a');
-			$(a).attr("href","/logout");
-			$(a).attr("class","logout");
-			$(a).html("Salir");
-		blocker.appendChild(a);
 		document.body.insertBefore(blocker, document.body.firstChild);
 	}
 	

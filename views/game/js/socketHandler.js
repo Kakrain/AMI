@@ -1,4 +1,6 @@
-var conn = io();
+var room = "/"+getUrlVars()["code"];
+
+var conn = io(room);
 
 conn.on('enable-game', function(msg){
 	interface1.enableControls();
@@ -55,3 +57,15 @@ conn.on('b32-up', function(msg){
 	interface1.b32Up();
 	console.log(msg);
 });
+
+function getUrlVars(){
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}

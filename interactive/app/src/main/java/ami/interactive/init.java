@@ -1,10 +1,7 @@
 package ami.interactive;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -41,7 +38,7 @@ public class init extends Activity {
 
     public void loadMain(){
         finish();
-        Intent main = new Intent(this,main.class);
+        Intent main = new Intent(this,login.class);
         startActivity(main);
     }
 }

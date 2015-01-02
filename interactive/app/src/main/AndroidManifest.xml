@@ -19,12 +19,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".main"
+            android:name=".login"
             android:label="@string/app" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".register"
+            android:label="@string/app" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ami.interactive.login" />
+        </activity>
+        <activity
+            android:name=".game"
+            android:label="@string/app" >
         </activity>
     </application>
 

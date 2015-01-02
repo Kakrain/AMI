@@ -7,7 +7,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var path = require('path');
 var bodyParser = require('body-parser');
-var database = require('./config/database.js');
+var database = require('./controllers/database.js');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash = require('connect-flash');
@@ -15,10 +15,10 @@ var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var port = process.env.PORT || 3000;
-var sess;
+var users = [];
 
 mongoose.connect(database.url);
-require('./config/passport')(passport);
+require('./controllers/passport')(passport);
 
 // Configurations
 app.use(morgan('dev'));
@@ -38,8 +38,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-require('./config/socketio')(io);
-require('./config/routes.js')(app, passport);
+require('./controllers/socketio')(io, users);
+require('./controllers/routes.js')(app, passport, express);
 
 http.listen(port, function(){
 	console.log('Listening on *: ' + port);

@@ -8,10 +8,19 @@ body {
 	overflow: hidden;
 	font-family: arial;
 }
-.logout {
+
+nav {
 	position: fixed;
-	text-decoration: none;
-	top: 30px;
+	top: 15px;
 	right: 30px;
-	color:white
+}
+nav ul { list-style-type: none }
+nav ul li { 
+	display:inline-block;
+	padding: 10px;
+}
+nav ul #username { border-right: 2px solid white }
+nav ul li a {
+	color: white;
+	text-decoration: none;
 }
