@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/padding"
+    android:background="#D9D9D9">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/register_text"
+        android:textSize="@dimen/font_size_text"/>
+
+    <EditText
+        android:id="@+id/register_email"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:hint="@string/login_email"
+        android:inputType="text"
+        android:layout_marginTop="30dip"
+        android:textSize="@dimen/font_size_text"/>
+    <EditText
+        android:id="@+id/register_password"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:hint="@string/login_password"
+        android:inputType="textPassword"
+        android:textSize="@dimen/font_size_text"/>
+    <EditText
+        android:id="@+id/register_confirm_password"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:hint="@string/login_confirm_password"
+        android:inputType="textPassword"
+        android:textSize="@dimen/font_size_text"/>
+
+    <Button android:id="@+id/register_enter"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:text="@string/login_enter"
+        android:layout_marginTop="10dip"
+        android:textSize="@dimen/font_size_button"/>
+
+</LinearLayout>

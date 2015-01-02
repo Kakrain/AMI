@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/padding"
+    android:background="#D9D9D9"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="100dip"
+        android:layout_height="100dip"
+        android:src="@drawable/ic_launcher"
+        android:layout_gravity="center"/>
+    <EditText
+        android:id="@+id/login_email"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:hint="@string/login_email"
+        android:inputType="text"
+        android:layout_marginTop="60dip"
+        android:textSize="@dimen/font_size_text"/>
+    <EditText
+        android:id="@+id/login_password"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:hint="@string/login_password"
+        android:inputType="textPassword"
+        android:textSize="@dimen/font_size_text"/>
+    <Button android:id="@+id/login_enter"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:text="@string/login_enter"
+        android:layout_marginTop="10dip"
+        android:textSize="@dimen/font_size_button"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login_register_pre"
+        android:layout_marginTop="60dip"
+        android:textSize="@dimen/font_size_text"
+        android:gravity="center"/>
+
+    <Button android:id="@+id/login_register"
+        android:layout_width="fill_parent"
+        android:background="@null"
+        android:layout_height="wrap_content"
+        android:selectAllOnFocus="false"
+        android:linksClickable="false"
+        android:autoLink="all"
+        android:text="@string/login_register"
+        android:textSize="@dimen/font_size_button"
+        android:textColor="#494B4F"/>
+
+</LinearLayout>
