@@ -57,7 +57,7 @@ module.exports = function(app, passport, express) {
     });
 	
 	app.all('/game/*:file', function(req, res, next) {
-		console.log("*****PRIVATE*****");
+		console.log("*****GAME*****");
 		if (req.isAuthenticated()) {
 			next();
 		} else {

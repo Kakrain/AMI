@@ -52,7 +52,7 @@ public class login extends Activity {
 
     public void socketIOSetUp(){
         try {
-            socket = IO.socket("http://192.168.137.150:3000");
+            socket = IO.socket("http://192.168.0.3:3000");
         } catch (URISyntaxException e) {
             System.out.println("ERROR: " + e);
         }
@@ -75,10 +75,15 @@ public class login extends Activity {
         socket.on("validation-response-no", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                Context context = getApplicationContext();
                 CharSequence text = args[0].toString();
-                Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
                 toast.show();
+            }
+        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                connected = false;
+                System.out.println("DISCONNECTED");
             }
         });
         socket.connect();

@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dip"
         android:hint="@string/login_email"
-        android:inputType="text"
+        android:inputType="textEmailAddress"
         android:layout_marginTop="60dip"
         android:textSize="@dimen/font_size_text"/>
     <EditText

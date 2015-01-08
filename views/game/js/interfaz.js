@@ -118,17 +118,17 @@ function Interfaz (camera,scene) {
 		$("#blocker").fadeIn();
 	}
 	
-	this.b12Down = function(){ controls.moveForward = true; }
-	this.b12Up = function(){ controls.moveForward = false;}
+	this.b12Down = function(){ controls.setForward(true); }
+	this.b12Up = function(){ controls.setForward(false);}
 	
-	this.b21Down = function(){ controls.moveLeft = true; }
-	this.b21Up = function(){ controls.moveLeft = false;}
+	this.b21Down = function(){ controls.setLeft(true); }
+	this.b21Up = function(){ controls.setLeft(false);}
 	
-	this.b23Down = function(){ controls.moveRight = true; }
-	this.b23Up = function(){ controls.moveRight = false; }
+	this.b23Down = function(){ controls.setRight(true); }
+	this.b23Up = function(){ controls.setRight(false); }
 	
-	this.b32Down = function(){ controls.moveBackward = true; }
-	this.b32Up = function(){ controls.moveBackward = false; }
+	this.b32Down = function(){ controls.setBackward(true); }
+	this.b32Up = function(){ controls.setBackward(false); }
 	
 	this.addTags();
 	this.InitControls();

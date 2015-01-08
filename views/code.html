@@ -32,12 +32,12 @@
 		<script src="/socket.io/socket.io.js"></script>
 		<script>
 			var conn = io();
-			conn.emit('temporal-web',document.getElementById("code").html);
+			conn.emit('temporal-web',document.getElementById("code").innerHTML);
 			conn.on('match-correct', function(code){
-				if(code === document.getElementById("code").html){
+				if(code === document.getElementById("code").innerHTML){
 					var href = window.location.href;
 					href = href.substr(0,href.indexOf('/'));
-					href = href + "/private?code=" + code;
+					href = href + "/game?code=" + code;
 					window.location.href = href;
 				}
 			});	

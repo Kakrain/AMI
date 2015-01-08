@@ -48,6 +48,19 @@ THREE.PointerLockControls = function ( camera ) {
 		return altura;
 	}
 	
+	this.setForward = function(b){
+		moveForward = b;
+	}
+	this.setBackward = function(b){
+		moveBackward = b;
+	}
+	this.setLeft = function(b){
+		moveLeft = b;
+	}
+	this.setRight = function(b){
+		moveRight = b;
+	}
+	
 	var onKeyDown = function ( event ) {
 		switch ( event.keyCode ) {
 			case 38: // up

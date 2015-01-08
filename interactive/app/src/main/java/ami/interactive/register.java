@@ -30,7 +30,7 @@ public class register extends Activity {
     @InjectView(R.id.register_password) EditText password;
     @InjectView(R.id.register_confirm_password) EditText confirm_password;
     Socket socket;
-    Boolean connected;
+    Boolean connected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +43,7 @@ public class register extends Activity {
 
     public void socketIOSetUp(){
         try {
-            socket = IO.socket("http://192.168.137.150:3000");
+            socket = IO.socket("http://192.168.0.3:3000");
         } catch (URISyntaxException e) {
             System.out.println("ERROR: " + e);
         }
@@ -51,13 +51,14 @@ public class register extends Activity {
             @Override
             public void call(Object... args) {
                 connected = true;
-                System.out.println("CONNECTED");
+                System.out.println("CONNECTED FOR REGISTER");
             }
         });
         socket.on("registration-response", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 socket.disconnect();
+                System.out.println("DISCONNECTED FROM REGISTER");
                 finish();
                 Intent code = new Intent(getApplicationContext(), game.class);
                 startActivity(code);
@@ -66,9 +67,8 @@ public class register extends Activity {
         socket.on("registration-response-no", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                Context context = getApplicationContext();
                 CharSequence text = args[0].toString();
-                Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
                 toast.show();
             }
         });

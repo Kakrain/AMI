@@ -2,11 +2,11 @@ var room = "/"+getUrlVars()["code"];
 
 var conn = io(room);
 
-conn.on('enable-game', function(msg){
+conn.on('resume-game', function(msg){
 	interface1.enableControls();
 	console.log("Mensaje: " + msg);
 });	
-conn.on('disable-game',function(msg){
+conn.on('pause-game',function(msg){
 	interface1.disableControls();
 	console.log("Mensaje: " + msg);
 });
@@ -25,35 +25,35 @@ conn.on('gyroscope-z', function(gValue){
 });
 
 
-conn.on('b12-down', function(msg){
+conn.on('move-forward-down', function(msg){
 	interface1.b12Down();
 	console.log(msg);
 });
-conn.on('b12-up', function(msg){
+conn.on('move-forward-up', function(msg){
 	interface1.b12Up();
 	console.log(msg);
 });
-conn.on('b21-down', function(msg){
+conn.on('move-left-down', function(msg){
 	interface1.b21Down();
 	console.log(msg);
 });
-conn.on('b21-up', function(msg){
+conn.on('move-left-up', function(msg){
 	interface1.b21Up();
 	console.log(msg);
 });
-conn.on('b23-down', function(msg){
+conn.on('move-right-down', function(msg){
 	interface1.b23Down();
 	console.log(msg);
 });
-conn.on('b23-up', function(msg){
+conn.on('move-right-up', function(msg){
 	interface1.b23Up();
 	console.log(msg);
 });
-conn.on('b32-down', function(msg){
+conn.on('move-backward-down', function(msg){
 	interface1.b32Down();
 	console.log(msg);
 });
-conn.on('b32-up', function(msg){
+conn.on('move-backward-up', function(msg){
 	interface1.b32Up();
 	console.log(msg);
 });

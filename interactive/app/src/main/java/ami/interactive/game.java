@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.On;
 import com.github.nkzawa.socketio.client.Socket;
 
 import java.net.URISyntaxException;
@@ -31,6 +32,7 @@ import java.net.URISyntaxException;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
 import butterknife.OnTouch;
 
 
@@ -39,10 +41,14 @@ public class game extends Activity implements SensorEventListener {
     @InjectView(R.id.game_code) EditText game_code;
     @InjectView(R.id.game_controls) TableLayout game_controls;
     @InjectView(R.id.game_message) TextView game_message;
-    @InjectView(R.id.game_switch) Switch game_switch;
+    @InjectView(R.id.game_move_forward) Button moveForward;
+    @InjectView(R.id.game_move_left) Button moveLeft;
+    @InjectView(R.id.game_move_camera) Button camera;
+    @InjectView(R.id.game_move_right) Button moveRight;
+    @InjectView(R.id.game_move_backward) Button moveBackward;
 
     String code;
-    Socket socket;
+    Socket socket, namespace;
     Boolean moveCamera = false;
     SensorManager mSensorManager;
     float mLastX, mLastY, mLastZ;
@@ -59,51 +65,123 @@ public class game extends Activity implements SensorEventListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        setContentView(R.layout.login);
+        setContentView(R.layout.game);
 
         fadeIn = AnimationUtils.loadAnimation(this,R.anim.fade_in);
         fadeOut = AnimationUtils.loadAnimation(this,R.anim.fade_out);
 
         ButterKnife.inject(this);
+        socketIOSetUp();
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        moveForward.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { namespace.emit("move-forward-down"); }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { namespace.emit("move-forward-up"); }
+                return false;
+            }
+        });
+        moveLeft.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { namespace.emit("move-left-down"); }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { namespace.emit("move-left-up"); }
+                return false;
+            }
+        });
+        camera.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { moveCamera = true; }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { moveCamera = false; }
+                return false;
+            }
+        });
+        moveRight.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { namespace.emit("move-right-down"); }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { namespace.emit("move-right-up"); }
+                return false;
+            }
+        });
+        moveBackward.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { namespace.emit("move-backward-down"); }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { namespace.emit("move-backward-up"); }
+                return false;
+            }
+        });
+
+        onPause();
     }
 
-    public void socketIOSetUp(String ip, String matchCode, String port){
+    public void socketIOSetUp(){
         try {
-            socket = IO.socket("http://" + ip + "/" + matchCode +":" + port);
+            socket = IO.socket("http://192.168.0.3:3000");
         } catch (URISyntaxException e) { e.printStackTrace(); }
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                socket.emit("temporal-mobile",code);
+                System.out.println("CONNECTED TO GAME!");
             }
         }).on("match-correct", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                LinearLayout game_match = (LinearLayout) findViewById(R.id.game_match);
-                game_match.startAnimation(fadeOut);
-                game_match.setVisibility(View.GONE);
-                game_message.startAnimation(fadeIn);
-                game_message.setVisibility(View.VISIBLE);
+                socket.disconnect();
+                namespaceSetUp();
             }
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
-            public void call(Object... args) {}
+            public void call(Object... args) {
+                System.out.println("DISCONNECTED FROM GAME!");
+            }
         });
         socket.connect();
+    }
+
+    public void namespaceSetUp(){
+        try {
+            namespace = IO.socket("http://192.168.0.3:3000/" + code);
+        }catch(Exception e){}
+        namespace.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                System.out.println("CONNECTED TO CUSTOM NAMESPACE!");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LinearLayout game_match = (LinearLayout) findViewById(R.id.game_match);
+                        game_match.startAnimation(fadeOut);
+                        game_match.setVisibility(View.GONE);
+                        game_message.startAnimation(fadeIn);
+                        game_message.setVisibility(View.VISIBLE);
+                        onResume();
+                    }
+                });
+            }
+        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                System.out.println("DISCONNECTED FROM CUSTOM ROOM!");
+            }
+        });
+        namespace.connect();
     }
 
     @OnCheckedChanged(R.id.game_switch)
     public void switchAction(boolean isOn){
         if (isOn) {
-            socket.emit("resume-game");
+            namespace.emit("resume-game");
             game_message.startAnimation(fadeOut);
             game_message.setVisibility(View.GONE);
             game_controls.startAnimation(fadeIn);
             game_controls.setVisibility(View.VISIBLE);
         } else {
-            socket.emit("pause-game");
+            namespace.emit("pause-game");
             game_controls.startAnimation(fadeOut);
             game_controls.setVisibility(View.GONE);
             game_message.startAnimation(fadeIn);
@@ -111,36 +189,12 @@ public class game extends Activity implements SensorEventListener {
         }
     }
 
-    @OnTouch({R.id.game_move_forward, R.id.game_move_left, R.id.game_move_camera, R.id.game_move_right, R.id.game_move_backward, R.id.game_code_button})
-    public boolean move(Button button, MotionEvent motionEvent){
-        switch(button.getId()){
-            case R.id.game_move_forward:
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) { socket.emit("move-forward-down"); }
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { socket.emit("move-forward-up"); }
-                break;
-            case R.id.game_move_left:
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) { socket.emit("move-left-down"); }
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { socket.emit("move-left-up"); }
-                break;
-            case R.id.game_move_camera:
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) { moveCamera = true; }
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { moveCamera = false; }
-                break;
-            case R.id.game_move_right:
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) { socket.emit("move-right-down"); }
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { socket.emit("move-right-up"); }
-                break;
-            case R.id.game_move_backward:
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) { socket.emit("move-backward-down"); }
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { socket.emit("move-backward-up"); }
-                break;
-            case R.id.game_code_button:
-                code = game_code.getText().toString();
-                if(code.length()>5)
-                    socketIOSetUp("192.168.137.150",code,"3000");
-                break;
+    @OnClick(R.id.game_code_button)
+    public void click(){
+        code = game_code.getText().toString();
+        if(code.length()==5) {
+            socket.emit("temporal-mobile",code);
         }
-        return true;
     }
 
     @Override
@@ -167,12 +221,12 @@ public class game extends Activity implements SensorEventListener {
                         mLastY = y;
                         mLastZ = z;
                         if (deltaX > deltaY) {
-                            if(socket.connected())
-                                socket.emit("attack");
+                            if(namespace.connected())
+                                namespace.emit("attack");
                         }
                         if (deltaZ > deltaY) {
-                            if (socket.connected())
-                                socket.emit("block");
+                            if (namespace.connected())
+                                namespace.emit("block");
                         }
                     }
                     break;
