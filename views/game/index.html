@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Nombre</title>
+		<title>El Camino del Inca</title>
 		<meta charset="UTF-8">
 		<meta http-equiv="content-type" content="text/html;">
 		<meta name="author" content="David Barrera, Denny Schuldt">
@@ -56,6 +56,8 @@
 			var boxes=null;
 			var mesh=null;
 			var enemy,ally,weapon;
+			//loadHalberdiers();
+			//interface1.setWeapon(new THREE.Mesh(new THREE.CubeGeometry(20, 20, 30), new THREE.MeshLambertMaterial({color:"blue"})));
 			var render = function () {
 				requestAnimationFrame(render);				
 				camera.fov = 75;
@@ -91,11 +93,14 @@
 				  	worker.postMessage("marco");
 				  }else{
 				  	try{
+				  		//$.notify("bastardo no es null");//no pasa por aqui cuando falla...tal ves al de arriba cambia de puntero
+				  		
 						worker.terminate();
 						weapon=new Weapon(30,10,1);
 						enemy=new Actor (halberdierMatico.generate(),scene,ambiente,allies,enemies);
 						enemies[enemies.length]=enemy;
 						enemy.setPosition(60,-50,60);
+						
 						enemy.setAzimut(Math.PI/2);
 						enemy.addArma(weapon,halberdMatico.generate());
 						/*enemy.addPatrolPosition(new THREE.Vector3(10,0,10));
@@ -105,10 +110,13 @@
 						allies[allies.length]=ally;
 						ally.setPosition(-60,-50,60);
 						ally.addArma(weapon.clone(),halberdMatico.generate());
+						
 				  	}catch(err){
 				  		loadHalberdiers();
 				  		$.notify("erro una vez");
 				  		}
+				  	//$.notify("esta cargado correcto: "+halberdierMatico.loadedCorrectly());
+					
 				  }
 				}, false);
 			}

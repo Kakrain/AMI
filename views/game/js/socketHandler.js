@@ -12,6 +12,10 @@ conn.on('pause-game',function(msg){
 });
 conn.on('disconnect', function(){
 	console.log('user disconnected');
+	var href = window.location.href;
+	href = href.substr(0,href.indexOf('/'));
+	href = href + "/logout";
+	window.location.href = href;
 });
 
 conn.on('gyroscope-x', function(gValue){

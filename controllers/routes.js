@@ -47,7 +47,15 @@ module.exports = function(app, passport, express) {
 			for( var i=0; i < 5; i++ )
 				text += code.charAt(Math.floor(Math.random() * code.length));
 			var email = req.user.local.email;
-			email = email.substr(0,email.indexOf('@'));
+			try{
+				email = email.substr(0,email.indexOf('@'));
+			}catch(err){
+				if(req.user.facebook.name){
+					email = req.user.facebook.name;
+				}else if(req.user.twitter.username){
+					email = req.user.twitter.username;
+				}
+			}
 			req.flash('username',email);
 			req.flash('code',text);
 			res.render('code.html', {username: req.flash('username'), message: req.flash('code')});

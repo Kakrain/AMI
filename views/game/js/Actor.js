@@ -32,8 +32,8 @@ this.setPosition=function(x,y,z){
 	mesh.position.z=z;
 }
 this.setAzimut=function(angle){
-	$.notify("vec: "+mesh.rotation.x);
-	mesh.rotation.applyAxisAngle(y,angle);
+	//$.notify("vec: "+mesh.rotation.x);
+	//mesh.rotation.applyAxisAngle(y,angle);
 }
 	var advancePatrolPosition = function(){
 		if(patrulla.length<2){return;}

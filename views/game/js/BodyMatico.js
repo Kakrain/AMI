@@ -1,7 +1,7 @@
 function BodyMatico(url,skin,_scene){
 	var scene=_scene
 	var model = new MM3DModel;
-	var INskinAnimations=null;
+var INskinAnimations=null;
 	var INgeometry=null;
 	var INmaterial=null;
 	var busy=false;
@@ -23,11 +23,11 @@ function BodyMatico(url,skin,_scene){
     	INmaterial=m.clone();
     }
 	this.isReady=function(){
-		return ready;
+	return ready;
 	}
 	model.OnLoad = function()
 	{
-		geometry = model.GetGeometry();//crea un mesh;
+	geometry = model.GetGeometry();//crea un mesh;
 		geometry.computeFaceNormals();
 		geometry.computeBoundingSphere();
 		setGeometry(geometry);
@@ -62,7 +62,7 @@ INmaterial=material;
 			{
 				for(var j = 0; j < mesh.skeleton.bones.length; j++)
 				{
-					if(mesh.skeleton.bones[i].parent == mesh.skeleton.bones[j])
+				if(mesh.skeleton.bones[i].parent == mesh.skeleton.bones[j])
 					{
 						boxes[j].add(boxes[i]);
 					}

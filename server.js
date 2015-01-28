@@ -32,7 +32,8 @@ app.use(session({
     name: 'mongodb',
     proxy: true,
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: true,
+	cookie: { secure: false }
 }));
 app.use(passport.initialize());
 app.use(passport.session());

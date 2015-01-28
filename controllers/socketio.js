@@ -79,10 +79,7 @@ module.exports = function(io, users) {
 					}).on('move-backward-up',function(){
 						room.emit('move-backward-up','Move backward up');
 					}).on('disconnect', function(code){ 
-						var index = array.indexOf(code);
-						if (index > -1) {
-							users = users.splice(index,1);
-						}
+						room.emit('disconnect');
 					});
 				});
 				io.emit("match-correct",code);

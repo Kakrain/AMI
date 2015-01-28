@@ -12,6 +12,11 @@ function Interfaz (camera,scene) {
 	this.setAmbiente = function(ambiente){
 		controls.setAmbiente(ambiente);
 	}
+	this.setWeapon=function(w){
+	 w.overdraw = true;	
+	scene.add(w);
+		controls.setWeapon(w);
+	}
 	
 	this.update = function(){
 		controls.isOnObject(false);

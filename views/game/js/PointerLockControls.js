@@ -16,6 +16,8 @@ THREE.PointerLockControls = function ( camera ) {
 	var moveLeft          = false;
 	var moveRight        = false;
 
+	var weapon=null;
+	
 	var isOnObject = false;
 	var canJump    = false;
 	var prevTime    = performance.now();
@@ -24,6 +26,9 @@ THREE.PointerLockControls = function ( camera ) {
 	camera.rotation.order = "YXZ";
 	this.setAmbiente = function(_ambiente){
 		Ambiente = _ambiente;
+	}
+	this.setWeapon=function(w){
+	weapon=w;
 	}
 	
 	var onMouseMove = function ( event ) {
@@ -125,6 +130,12 @@ THREE.PointerLockControls = function ( camera ) {
 			var vel = altura*10;
 					var vector = new THREE.Vector3( 0, 0, -1 );
 					vector.applyQuaternion( camera.quaternion );
+					if(weapon!=null){
+						
+						weapon.position.x=camera.position.x+vector.x*0.5;
+						weapon.position.y=camera.position.y+vector.y*0.5;
+						weapon.position.z=camera.position.z+vector.z*0.5;
+					}
 					if (moveForward) { //38 up key
 					camera.position.x+=vel*vector.x*delta;
 					camera.position.z+=vel*vector.z*delta;

@@ -104,7 +104,8 @@ module.exports = function(passport) {
 	passport.use(new TwitterStrategy({
         consumerKey : configAuth.twitterAuth.consumerKey,
         consumerSecret : configAuth.twitterAuth.consumerSecret,
-        callbackURL : configAuth.twitterAuth.callbackURL
+        //callbackURL : configAuth.twitterAuth.callbackURL
+		callbackURL: '/auth/twitter/callback'
     },
     function(token, tokenSecret, profile, done) {
         process.nextTick(function() {
