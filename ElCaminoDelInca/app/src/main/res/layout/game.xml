@@ -39,6 +39,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/game_code_button"
                 android:padding="@dimen/font_size_text"/>
+            <TextView
+                android:layout_width="300dip"
+                android:layout_height="wrap_content"
+                android:text="Para obtener un código de juego, ingresa desde tu computadora a www.elcaminodelinca.com y selecciona jugar ahora."
+                android:gravity="center"
+                android:layout_marginTop="40dip"/>
         </LinearLayout>
 
         <TextView
@@ -61,47 +67,56 @@
             <TableRow
                 android:gravity="center">
                 <Button
-                    android:id="@+id/b11"
+                    android:id="@+id/game_move_nw"
                     android:layout_width="100dip"
-                    android:layout_height="100dip"/>
+                    android:layout_height="100dip"
+                    android:background="@drawable/buttonnw"/>
                 <Button
                     android:id="@+id/game_move_forward"
                     android:layout_width="100dip"
-                    android:layout_height="100dip"/>
+                    android:layout_height="100dip"
+                    android:background="@drawable/buttonforward"/>
                 <Button
-                    android:id="@+id/b13"
+                    android:id="@+id/game_move_no"
                     android:layout_width="100dip"
-                    android:layout_height="100dip"/>
+                    android:layout_height="100dip"
+                    android:background="@drawable/buttonno"/>
             </TableRow>
             <TableRow
                 android:gravity="center">
                 <Button
                     android:id="@+id/game_move_left"
                     android:layout_width="100dip"
-                    android:layout_height="100dip"/>
+                    android:layout_height="100dip"
+                    android:background="@drawable/buttonleft"/>
                 <Button
                     android:id="@+id/game_move_camera"
                     android:layout_width="100dip"
-                    android:layout_height="100dip"/>
+                    android:layout_height="100dip"
+                    android:background="@drawable/buttoncamera"/>
                 <Button
                     android:id="@+id/game_move_right"
                     android:layout_width="100dip"
-                    android:layout_height="100dip"/>
+                    android:layout_height="100dip"
+                    android:background="@drawable/buttonright"/>
             </TableRow>
             <TableRow
                 android:gravity="center">
                 <Button
-                    android:id="@+id/b31"
+                    android:id="@+id/game_move_sw"
                     android:layout_width="100dip"
-                    android:layout_height="100dip"/>
+                    android:layout_height="100dip"
+                    android:background="@drawable/buttonsw"/>
                 <Button
                     android:id="@+id/game_move_backward"
                     android:layout_width="100dip"
-                    android:layout_height="100dip"/>
+                    android:layout_height="100dip"
+                    android:background="@drawable/buttonbackward"/>
                 <Button
-                    android:id="@+id/b33"
+                    android:id="@+id/game_move_so"
                     android:layout_width="100dip"
-                    android:layout_height="100dip"/>
+                    android:layout_height="100dip"
+                    android:background="@drawable/buttonso"/>
             </TableRow>
         </TableLayout>
 

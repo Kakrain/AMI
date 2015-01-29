@@ -82,7 +82,7 @@ module.exports = function(io, users) {
 						room.emit('disconnect');
 					});
 				});
-				io.emit("match-correct",code);
+				io.sockets.emit("match-correct",code);
 			}
 		});
 		

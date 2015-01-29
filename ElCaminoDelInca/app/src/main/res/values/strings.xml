@@ -2,9 +2,12 @@
 <resources>
 
     <string name="app_name">El Camino Del Inca</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_section1">Libre</string>
+    <string name="title_section2">Espada</string>
+    <string name="title_section3">Lanza</string>
+    <string name="title_section4">Arco</string>
+
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -17,7 +20,7 @@
     <string name="login_enter">Ingresar</string>
     <string name="login_register_pre">¿Aún no tienes una cuenta?</string>
     <string name="login_register"><![CDATA[<u>Regístrate</u>]]></string>
-    <string name="game_code_pre">Ingresa el código de emparejamiento:</string>
+    <string name="game_code_pre">Ingresa el código de juego:</string>
     <string name="game_pause">Activa para jugar\n(Mueve el switch)</string>
     <string name="game_code_button">Listo</string>
     <string name="register_text">Regístrate y se parte de una nueva experiencia en juegos:</string>

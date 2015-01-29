@@ -24,14 +24,10 @@ import butterknife.OnClick;
 
 public class Login extends Activity {
 
-    @InjectView(R.id.login_email)
-    EditText email;
-    @InjectView(R.id.login_password)
-    EditText password;
-    @InjectView(R.id.login_enter)
-    Button enter;
-    @InjectView(R.id.login_register)
-    Button register;
+    @InjectView(R.id.login_email) EditText email;
+    @InjectView(R.id.login_password) EditText password;
+    @InjectView(R.id.login_enter) Button enter;
+    @InjectView(R.id.login_register) Button register;
 
     Socket socket;
     Boolean connected = false;

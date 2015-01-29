@@ -43,14 +43,18 @@ import butterknife.OnClick;
 
 public class Game extends ActionBarActivity implements SensorEventListener, NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    TextView game_message;
     @InjectView(R.id.game_code) EditText game_code;
     @InjectView(R.id.game_controls) TableLayout game_controls;
-    @InjectView(R.id.game_message) TextView game_message;
+    @InjectView(R.id.game_move_nw) Button moveNw;
     @InjectView(R.id.game_move_forward) Button moveForward;
+    @InjectView(R.id.game_move_no) Button moveNo;
     @InjectView(R.id.game_move_left) Button moveLeft;
     @InjectView(R.id.game_move_camera) Button camera;
     @InjectView(R.id.game_move_right) Button moveRight;
+    @InjectView(R.id.game_move_sw) Button moveSw;
     @InjectView(R.id.game_move_backward) Button moveBackward;
+    @InjectView(R.id.game_move_so) Button moveSo;
 
     String code;
     Socket socket, namespace;
@@ -85,24 +89,65 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
         fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
         fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
 
+        game_message = (TextView) findViewById(R.id.game_message);
         ButterKnife.inject(this);
         socketIOSetUp();
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
+        moveNw.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-forward-down");
+                    namespace.emit("move-left-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-forward-up");
+                    namespace.emit("move-left-up");
+                }
+                return false;
+            }
+        });
         moveForward.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { namespace.emit("move-forward-down"); }
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { namespace.emit("move-forward-up"); }
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-forward-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-forward-up");
+                }
+                return false;
+            }
+        });
+        moveNo.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-forward-down");
+                    namespace.emit("move-right-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-forward-up");
+                    namespace.emit("move-right-up");
+                }
                 return false;
             }
         });
         moveLeft.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { namespace.emit("move-left-down"); }
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { namespace.emit("move-left-up"); }
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-left-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-left-up");
+                }
                 return false;
             }
         });
@@ -117,16 +162,56 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
         moveRight.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { namespace.emit("move-right-down"); }
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { namespace.emit("move-right-up"); }
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-right-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-right-up");
+                }
+                return false;
+            }
+        });
+        moveSw.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-backward-down");
+                    namespace.emit("move-left-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-backward-up");
+                    namespace.emit("move-left-up");
+                }
                 return false;
             }
         });
         moveBackward.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { namespace.emit("move-backward-down"); }
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { namespace.emit("move-backward-up"); }
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-backward-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-backward-up");
+                }
+                return false;
+            }
+        });
+        moveSo.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-backward-down");
+                    namespace.emit("move-right-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-backward-up");
+                    namespace.emit("move-right-up");
+                }
                 return false;
             }
         });
@@ -153,7 +238,7 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                System.out.println("DISCONNECTED FROM GAME!");
+                System.out.println("SOCKET DISCONNECTED FROM GAME!");
             }
         });
         socket.connect();
@@ -176,7 +261,6 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
                         game_match.setVisibility(View.GONE);
                         game_message.startAnimation(fadeIn);
                         game_message.setVisibility(View.VISIBLE);
-                        onResume();
                     }
                 });
             }
@@ -253,9 +337,9 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
                     break;
                 case Sensor.TYPE_GYROSCOPE:
                     if(moveCamera) {
-                        System.out.println("x:" + Float.toString(event.values[0]));
-                        System.out.println("y:" + Float.toString(event.values[1]));
-                        System.out.println("z:" + Float.toString(event.values[2]));
+                        namespace.emit("gyroscope-x",Float.toString(event.values[0]));
+                        namespace.emit("gyroscope-y",Float.toString(event.values[2]));
+                        namespace.emit("gyroscope-z",Float.toString(event.values[1]));
                     }
                     break;
             }
@@ -293,20 +377,38 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        //FragmentManager fragmentManager = getSupportFragmentManager();
-        //fragmentManager.beginTransaction().replace(R.id.container, PlaceholderFragment.newInstance(position + 1)).commit();
+        onSectionAttached(position+1);
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section1);
+                mTitle = getString(R.string.app_name);
+                try {
+                    getActionBar().setTitle(mTitle);
+                }catch(Exception e){}
+                System.out.println("HEY: " + mTitle);
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
+                try {
+                    getActionBar().setTitle(mTitle);
+                }catch(Exception e){}
+                System.out.println("HEY: " + mTitle);
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
+                try {
+                    getActionBar().setTitle(mTitle);
+                }catch(Exception e){}
+                System.out.println("HEY: " + mTitle);
+                break;
+            case 4:
+                mTitle = getString(R.string.title_section4);
+                try {
+                    getActionBar().setTitle(mTitle);
+                }catch(Exception e){}
+                System.out.println("HEY: " + mTitle);
                 break;
         }
     }
@@ -333,17 +435,28 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
         int id = item.getItemId();
         if (id == R.id.action_exit) {
             dataSource.closeSession();
-            if(namespace.connected()) {
-                namespace.emit("close-room");
-                namespace.disconnect();
+            if(namespace != null) {
+                if (namespace.connected()) {
+                    namespace.emit("close-room");
+                    namespace.disconnect();
+                    finish();
+                    Intent main = new Intent(getApplicationContext(), Login.class);
+                    startActivity(main);
+                }else {
+                    finish();
+                    Intent main = new Intent(getApplicationContext(), Login.class);
+                    startActivity(main);
+                }
+            }else{
+                finish();
+                Intent main = new Intent(getApplicationContext(), Login.class);
+                startActivity(main);
             }
-            finish();
-            Intent main = new Intent(getApplicationContext(),Login.class);
-            startActivity(main);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     public static class PlaceholderFragment extends Fragment {
         private static final String ARG_SECTION_NUMBER = "section_number";

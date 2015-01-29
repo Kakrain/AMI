@@ -37,7 +37,6 @@ public class Register extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
         socketIOSetUp();
         ButterKnife.inject(this);
         dataSource = new SessionDataSource(this);
