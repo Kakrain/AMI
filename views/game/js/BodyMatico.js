@@ -1,144 +1,143 @@
-function BodyMatico(url,skin,_scene){
-	var scene=_scene
-	var model = new MM3DModel;
-var INskinAnimations=null;
-	var INgeometry=null;
-	var INmaterial=null;
-	var busy=false;
-	var skinBoxes = null;
-	var weapon=null;
+function BodyMatico(url,_scene,_ambiente){
+	var scene=_scene;
+	var self=this;
+	var ambiente=_ambiente;
 	var ready=false;
 	var scale=1;
-
-	var setScale=function(s){
-		scale=s;
-	}
-    var setGeometry=function(g){
-    	INgeometry=g.clone();
-    }
-    var setSkinAnim=function(s){
-    	INskinAnimations=s;
-    }
-    var setMaterial=function(m){
-    	INmaterial=m.clone();
-    }
-	this.isReady=function(){
-	return ready;
-	}
-	model.OnLoad = function()
-	{
-	geometry = model.GetGeometry();//crea un mesh;
-		geometry.computeFaceNormals();
-		geometry.computeBoundingSphere();
-		setGeometry(geometry);
-		texture = THREE.ImageUtils.loadTexture(skin);
-		texture.needsUpdate = true;
-		material = new THREE.MeshLambertMaterial({map: texture, skinning: true});
-//setMaterial(material);
-INmaterial=material;
-		skinAnimations = model.GetSkeletalAnimations();
-		//setSkinAnim(skinAnimations);
-		INskinAnimations=skinAnimations;
-		ready=true;
-	}
-	model.Load(url);
-	this.generate=function(){
-		mesh = new THREE.SkinnedMesh(INgeometry, INmaterial);
-		mesh.scale.set(scale,scale,scale);
-		
-		var animations=[];
-		var boxes=[];
-		for(var i = 0; i < mesh.skeleton.bones.length; i++)
-		{
-			var b = new THREE.Object3D();
-			b.applyMatrix(mesh.skeleton.bones[i].matrix);
-			b.matrix.copy(mesh.skeleton.bones[i].matrix);
-			boxes[i] = b;
-		}
-		for(var i = 0; i < mesh.skeleton.bones.length; i++)
-		{
-			if(mesh.skeleton.bones[i].parent instanceof THREE.SkinnedMesh) mesh.add(boxes[i]);
-			else
-			{
-				for(var j = 0; j < mesh.skeleton.bones.length; j++)
-				{
-				if(mesh.skeleton.bones[i].parent == mesh.skeleton.bones[j])
-					{
-						boxes[j].add(boxes[i]);
-					}
-				}
-			}
-		}
-		for(var i = 0; i < INskinAnimations.length; i++) {animations[i] = new THREE.Animation(mesh, INskinAnimations[i]);}
-			animations[3].loop=false;
-			animations[4].loop=false;
-			animations[5].loop=false;
-			animations[6].loop=false;
-			animations[7].loop=false;
-			animations[8].loop=false;
-
-			animations[9].loop=false;
-			animations[10].loop=false;
-
-			animations[3].timeScale = 2.5;
-			animations[4].timeScale = 2.5;
-			animations[5].timeScale = 2.5;
-			animations[6].timeScale = 4;
-			animations[9].timeScale = 2.5;
-			animations[10].timeScale = 4;
-
-		mesh.castShadow = true;
-		mesh.receiveShadow = true;
-		scene.add(mesh);
-		return (new Body(mesh,animations,boxes));
-	}
-}
-function WeaponMatico(url,skin){
-	var ready=false;
-	var m = new MM3DModel();
 	var g=null;
 	var mat=null;
-	var scale=0.3;
+	var skinnedMesh=null;
+	var loader = new THREE.JSONLoader();
+
+	loader.load( url, function(geometry,materials){
+		var originalMaterial = materials[ 0 ];
+		   originalMaterial.skinning = true;
+		   skinnedMesh = new THREE.Marine( geometry, materials[ 0 ], true ,ambiente);
+		   skinnedMesh.castShadow = true;
+		   skinnedMesh.receiveShadow = true;
+		   g=geometry;
+		   mat=materials;
+	        scene.add( skinnedMesh );
+			ready=true;
+	} );
 	this.setScale=function(s){
 		scale=s;
+		skinnedMesh.scale.set(scale,scale,scale);
 	}
-	var setGeometry=function(geo){
-    	g=geo;
+this.generate=function(){
+		   var mesh = new THREE.Marine( g, mat[0], true ,ambiente);
+		   mesh.castShadow = true;
+		   mesh.receiveShadow = true;
+	        scene.add( mesh );
+	        return mesh;
+	}
+this.getMesh=function(){
+	return skinnedMesh;
+}
+this.update=function(dt){
+	skinnedMesh.update( dt );
+
+}
+function onCharacterLoaded(geometry, materials) {
+
+   
+       /* var loader = new THREE.JSONLoader();
+        loader.load( "models/m4.js", function(geometry,materials){
+        	gunMesh = new THREE.Mesh( geometry, materials[0] );
+	        scene.add( gunMesh );
+			skinnedMesh.addWeapon(gunMesh);
+	        
+        } );
+*/
+		
+      }
+    this.addWeapon=function(mesh){
+    	skinnedMesh.addWeapon(mesh);
     }
-		m.OnLoad = function()
-		{
-			setGeometry(this.GetGeometry());
-			var t = THREE.ImageUtils.loadTexture(skin);
-			t.needsUpdate = true;
-			mat = new THREE.MeshLambertMaterial({map: t});
-			ready=true;
-		}
-		m.Load(url);
-	this.generate=function(){
-		var weapon = new THREE.Mesh(g, mat);
-			weapon.scale.set(scale,scale,scale);
-		return weapon;
-	}
+
 	this.isReady=function(){
 		return ready;
 	}
 }
-function Body(_mesh,_animations,_skinboxes){
-	var mesh=_mesh;
-	var animations=_animations;	
-	var skinboxes=_skinboxes;
+function WeaponMatico(url,_scene){
+	var ready=false;
+	var scene=_scene;
+	var g=null;
+	var mat=null;
+	var scale=1;
+	this.setScale=function(s){
+		scale=s;
+	}
 
-this.update=function(){
+ 	var loader = new THREE.JSONLoader();
+        loader.load( url, function(geometry,materials){
+        	g=geometry;
+        	mat=materials[0];
+        	ready=true;
+		});
+	this.generate=function(){
+		var weapon=new THREE.Mesh( g.clone(), mat.clone() );
+		weapon.scale.set(scale,scale,scale);
+		scene.add(weapon);
+		return weapon;
+	}
+
+	this.isReady=function(){
+		return ready;
+	}
+}
+function Body(url,_scene,_scale){
+	var scene=_scene;
+	var scale=_scale;
+	var mesh;
+	var ready=false;
+	var radius=null;
+	mesh = new THREE.BlendCharacter();
+	mesh.load( url, 
+function() {
+				//mesh.rotation.y = Math.PI * -135 / 180;
+				mesh.position.y=-35.0;
+				
+				mesh.position.x=parseFloat(mesh.position.x);
+				mesh.position.y=parseFloat(mesh.position.y);
+				mesh.position.z=parseFloat(mesh.position.z);
+				mesh.scale.set(scale,scale,scale);
+				scene.add( mesh );				
+				var aspect = window.innerWidth / window.innerHeight;
+
+
+				radius = mesh.geometry.boundingSphere.radius;
+				//mesh.geometry.applyMatrix( new THREE.Matrix4().makeTranslation(0.5,0,0));		
+				//mesh.geometry.applyMatrix( new THREE.Matrix4().makeRotationAxis ( new THREE.Vector3( 1, -1, 1 ), Math.PI ));	
+				//mesh.rotation.set(0, Math.PI, 0); // Set initial rotation	
+				mesh.play('run', 1);
+				ready=true;
+			}
+
+		);
 	
-	for(var i = 0; i < skinboxes.length; i++)
+this.getRadius=function(){
+	return radius;
+}
+this.isReady=function(){
+	return ready;
+}
+this.getMesh=function(){
+	return mesh;
+}
+
+this.update=function(dt){
+	mesh.update(dt);
+	/*for(var i = 0; i < skinboxes.length; i++)
 		{
 			skinboxes[i].position.copy(mesh.skeleton.bones[i].position);
 			skinboxes[i].rotation.copy(mesh.skeleton.bones[i].rotation);
-		}
+		}*/
 }
 this.addWeapon=function(mesh){
-	skinboxes[13].add(mesh);
+	//skinboxes[13].add(mesh);
 }
+/*
 this.getMesh=function(){
 	return mesh;
 }
@@ -226,4 +225,8 @@ this.calmarse=function(){
 	this.stopwalk=function(){
 		animations[0].stop();
 	}
+
+
+
+	*/
 }
