@@ -50,6 +50,8 @@ function onCharacterLoaded(geometry, materials) {
         } );
 */
 		
+
+
       }
     this.addWeapon=function(mesh){
     	skinnedMesh.addWeapon(mesh);
@@ -225,8 +227,5 @@ this.calmarse=function(){
 	this.stopwalk=function(){
 		animations[0].stop();
 	}
-
-
-
 	*/
 }

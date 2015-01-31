@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>El Camino del Inca</title>
+		<title>Nombre</title>
 		<meta charset="UTF-8">
 		<meta http-equiv="content-type" content="text/html;">
 		<meta name="author" content="David Barrera, Denny Schuldt">
@@ -20,8 +20,10 @@
 		<script src="js/Raycaster.js"></script>
 		<script src="js/Clock.js"></script>
 		<script src="js/AmbienteMatico.js"></script>
-		<script src="js/jdataview.js"></script>
-		<script src="js/mm3d.js"></script>
+		<script src="js/BlendCharacter.js"></script>
+		<!--script src="js/jdataview.js"></script-->
+		<!--script src="js/mm3d.js"></script-->
+		<script src="js/Marine.js"></script>
 		<script src="js/BodyMatico.js"></script>
 		<script src="js/Weapon.js"></script>
 		<script src="js/Actor.js"></script>
@@ -37,6 +39,7 @@
 			var allies = [];
 			var enemies = [];
 
+			var blendMesh=null;
 			var interface1 = new Interfaz (camera,scene);
 			var ambiente  = new ambienteMatico(scene);	
 				ambiente.addPlaca('img/map/dirt-512.jpg',40,10);
@@ -50,24 +53,32 @@
 				ambiente.setMar("img/map/water512.jpg");
 				ambiente.generate();	
 
-			var halberdierMatico=new BodyMatico("models/halberdier.mm3d","img/textures/halberdier.png",scene);
-			var halberdMatico=new WeaponMatico("models/halberd.mm3d","img/textures/halberd.jpg");
+			 var lanzaMatico;
+			 var guerreroMatico;
+			//var halberdMatico=new WeaponMatico("models/halberd.mm3d","img/textures/halberd.jpg");
 			var halberdier=null;
+			var body=null;
+			var body2=null;
+
 			var boxes=null;
 			var mesh=null;
 			var enemy,ally,weapon;
-			//loadHalberdiers();
-			//interface1.setWeapon(new THREE.Mesh(new THREE.CubeGeometry(20, 20, 30), new THREE.MeshLambertMaterial({color:"blue"})));
+			var animation;
+loadHalberdiers();
+
 			var render = function () {
 				requestAnimationFrame(render);				
 				camera.fov = 75;
   				camera.updateProjectionMatrix();
 				interface1.update();
 				dt = clock.getDelta();
-				
 				if(interface1.enabled()){
+					/*THREE.AnimationHandler.update(dt);
+					if(halberdier.isReady()){
+						halberdier.update(dt);
+					}*/
 					THREE.AnimationHandler.update(dt);
-					 for (var i=0; i<enemies.length; i++) { 
+					for (var i=0; i<enemies.length; i++) { 
 					 	enemies[i].animar(dt);
 					 }
 					 for (var i=0; i < allies.length; i++) { 
@@ -83,57 +94,102 @@
 			setSun(scene);
 			setSpot(scene);			
 			render();
-
+/*
 			function loadHalberdiers(){
+				lanzaMatico=new WeaponMatico("models/m4.js",scene);
+				guerreroMatico=new BodyMatico("models/marine_anims.js",scene,ambiente);
+body=new BodyMatico("models/marine_anims.js",scene,ambiente);
+body2=new BodyMatico("models/marine_anims.js",scene,ambiente);
 				var worker = new Worker('js/worker.js');
 				worker.postMessage("marco");//usar al worker
 				worker.addEventListener('message', function(e) {
-				  if(!halberdierMatico.isReady()&&!halberdMatico.isReady()){
-				  	$.notify("marco");
+				  if(!(guerreroMatico.isReady()&&lanzaMatico.isReady())){
+				  	//$.notify("marco");
 				  	worker.postMessage("marco");
 				  }else{
-				  	try{
-				  		//$.notify("bastardo no es null");//no pasa por aqui cuando falla...tal ves al de arriba cambia de puntero
-				  		
+				  	var bod=guerreroMatico.generate();
+				  	bod.addWeapon(lanzaMatico.generate());
+				  	//body2.addWeapon(lanzaMatico.generate());
 						worker.terminate();
 						weapon=new Weapon(30,10,1);
-						enemy=new Actor (halberdierMatico.generate(),scene,ambiente,allies,enemies);
+						enemy=new Actor (bod,scene,ambiente,allies,enemies);
 						enemies[enemies.length]=enemy;
 						enemy.setPosition(60,-50,60);
-						
-						enemy.setAzimut(Math.PI/2);
-						enemy.addArma(weapon,halberdMatico.generate());
-						/*enemy.addPatrolPosition(new THREE.Vector3(10,0,10));
-						enemy.addPatrolPosition(new THREE.Vector3(-10,0,10));
-						enemy.addPatrolPosition(new THREE.Vector3(10,0,-10));*/
-						ally=new Actor (halberdierMatico.generate(),scene,ambiente,enemies,allies);
+						//enemy.setAzimut(Math.PI/2);
+						//enemy.addArma(weapon,halberdMatico.generate());
+					bod=guerreroMatico.generate();
+				  	bod.addWeapon(lanzaMatico.generate());
+				
+						enemy.addPatrolPosition(new THREE.Vector3(250,0,250));
+						enemy.addPatrolPosition(new THREE.Vector3(-250,0,250));
+						enemy.addPatrolPosition(new THREE.Vector3(250,0,-250));
+						ally=new Actor (bod,scene,ambiente,enemies,allies);
 						allies[allies.length]=ally;
 						ally.setPosition(-60,-50,60);
-						ally.addArma(weapon.clone(),halberdMatico.generate());
-						
-				  	}catch(err){
-				  		loadHalberdiers();
-				  		$.notify("erro una vez");
-				  		}
-				  	//$.notify("esta cargado correcto: "+halberdierMatico.loadedCorrectly());
-					
+						//ally.addArma(weapon.clone(),halberdMatico.generate());
+				  
+				  		
+				  }
+				}, false);
+			}*/
+			
+			function loadHalberdiers(){
+				lanzaMatico=new WeaponMatico("models/m4.js",scene);
+				//guerreroMatico=new BodyMatico("models/marine_anims.js",scene,ambiente);
+body=new BodyMatico("models/marine_anims.js",scene,ambiente);
+body2=new BodyMatico("models/marine3.js",scene,ambiente);
+				var worker = new Worker('js/worker.js');
+				worker.postMessage("marco");//usar al worker
+				worker.addEventListener('message', function(e) {
+				  if(!(body.isReady()&&body2.isReady()&&lanzaMatico.isReady())){
+				  	//$.notify("marco");
+				  	worker.postMessage("marco");
+				  }else{
+				  	//var bod=guerreroMatico.generate();
+				  	body.setScale(0.15);
+				  	body2.setScale(0.15);
+				  	body.addWeapon(lanzaMatico.generate());
+				  	body2.addWeapon(lanzaMatico.generate());
+						worker.terminate();
+						weapon=new Weapon(30,10,1);
+						enemy=new Actor (body,scene,ambiente,allies,enemies);
+						enemies[enemies.length]=enemy;
+						enemy.setPosition(60,-50,60);
+						//enemy.setAzimut(Math.PI/2);
+						//enemy.addArma(weapon,halberdMatico.generate());
+					//bod=guerreroMatico.generate();
+				  	//bod.addWeapon(lanzaMatico.generate());
+				
+						enemy.addPatrolPosition(new THREE.Vector3(250,0,250));
+						enemy.addPatrolPosition(new THREE.Vector3(-250,0,250));
+						enemy.addPatrolPosition(new THREE.Vector3(250,0,-250));
+						ally=new Actor (body2,scene,ambiente,enemies,allies);
+						allies[allies.length]=ally;
+						ally.setPosition(-60,-50,60);
+						//ally.addArma(weapon.clone(),halberdMatico.generate());
+				  
+				  		
 				  }
 				}, false);
 			}
+			
+			
 		</script>
 		<nav>
 			<ul>
 				<li><a href="#" id="username"></a></li>
+				<li><a href="/logout">Salir</a></li>
 			</ul>
 		</nav>
-		<section>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="js/socketHandler.js"></script>
+	</body>
+</html>
+
+<!--section>
 			<article>
 				<span>#1</span>
 				<p>En 1450 los incas emprenden su campaña para la conquista del norte andino, los incas luego de sucesivas victorias se interesaron por conquistar la provincia de cañari , en el camino sometieron a los Paltas,  eran indios muy bravos y feroces que cultivaban en su territorio frutos muy apreciados que llevaban su nombre y se deformaban la cabeza</p>
 				<p style="font-size:30px;">Activa para jugar<br><small style="font-size:20px;">(Mueve el switch de tu dispositivo)</small></p>
 			</article>
-		</section>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="js/socketHandler.js"></script>
-	</body>
-</html>
+		</section-->

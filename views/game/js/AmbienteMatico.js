@@ -29,7 +29,9 @@ function ambienteMatico(_scene){
 	this.setOffsetY = function(n){
 		offSetY = n;
 	}
-	
+	this.getYatOld = function(v){
+		return getYatOld(v);
+	}
 	this.getYat = function(v){
 		return getYat(v);
 	}
@@ -213,22 +215,17 @@ function ambienteMatico(_scene){
 		}
 		planeFisico.rotation.x = -Math.PI / 2;
 		planeFisico.position.y = altura+offSetY;
-		//planeFisico.material.side = THREE.DoubleSide;
-		scene.add(planeFisico);//si no se dibuja, no funciona
+		planeFisico.material.side = THREE.DoubleSide;
+		//scene.add(planeFisico);//si no se dibuja, no funciona
 		scene.updateMatrixWorld();//es importante
+		planeFisico.updateMatrixWorld();
+		
 	}
 	
 	this.drawRustico = function(){
 		scene.add(planeFisico);
 	}
 
-	function createSphere(x,y,z,color){
-		var sphere = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshPhongMaterial({color: color}) );
-			sphere.position.x = x;
-			sphere.position.y = y;
-			sphere.position.z = z;
-		scene.add(sphere);
-	}
 
 	function realPositionAt(i){
 		var v = planeFisico.geometry.vertices[i].clone();
@@ -239,20 +236,15 @@ function ambienteMatico(_scene){
 	
 	var getYat=function(v){
 		var y=v.y;
-		
 			raycaster.set(v, new THREE.Vector3(0,-1,0));
 		 	intersects = raycaster.intersectObject(planeFisico);
 			if(intersects.length!=0){
-				//$.notify("intersecta");
 				y=intersects[0].point.y;
 			}else{
 				raycaster.set(v, new THREE.Vector3(0,1,0));
 				intersects = raycaster.intersectObject(planeFisico);
 				if(intersects.length!=0){
-				//$.notify("intersecta");
 				y=intersects[0].point.y;
-				}else{
-					//$.notify("fallo",{autoHide: false});
 				}
 			}
 			return y;
