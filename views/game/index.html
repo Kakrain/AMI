@@ -134,10 +134,10 @@ body2=new BodyMatico("models/marine_anims.js",scene,ambiente);
 			}*/
 			
 			function loadHalberdiers(){
-				lanzaMatico=new WeaponMatico("models/m4.js",scene);
+				lanzaMatico=new WeaponMatico("models/lanzainca.js",scene);
 				//guerreroMatico=new BodyMatico("models/marine_anims.js",scene,ambiente);
 body=new BodyMatico("models/marine_anims.js",scene,ambiente);
-body2=new BodyMatico("models/marine3.js",scene,ambiente);
+body2=new BodyMatico("models/marine_anims.js",scene,ambiente);
 				var worker = new Worker('js/worker.js');
 				worker.postMessage("marco");//usar al worker
 				worker.addEventListener('message', function(e) {
