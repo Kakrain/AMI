@@ -24,6 +24,8 @@ THREE.PointerLockControls = function ( camera ) {
 	var velocity      = new THREE.Vector3();
 	var PI_2          = Math.PI / 2;
 	camera.rotation.order = "YXZ";
+	//camera.up = new THREE.Vector3(0,0,1);
+
 	this.setAmbiente = function(_ambiente){
 		Ambiente = _ambiente;
 	}
@@ -189,18 +191,21 @@ camera.position.y+=velocity.y * delta;
 			
 			var vectorX = new THREE.Vector3( 1 , 0 , 0 );
 				vectorX.applyQuaternion( camera.quaternion );
-			
+
 			var vectorNulo = new THREE.Vector3( 0 , 0 , 0 );
 				
-			mainWeapon.position.x = camera.position.x+vectorZ.x+vectorX.x;//+0.5;
-			mainWeapon.position.y = camera.position.y+vectorZ.y+vectorX.y;//-3.35;
-			mainWeapon.position.z = camera.position.z+vectorZ.z+vectorX.z;//+1;
+			mainWeapon.position.x = camera.position.x+vectorZ.x*0.8+vectorX.x*0.8-vectorY.x;//+0.5;
+			mainWeapon.position.y = camera.position.y+vectorZ.y*0.8+vectorX.y*0.8-vectorY.y;//-3.35;
+			mainWeapon.position.z = camera.position.z+vectorZ.z*0.8+vectorX.z*0.8-vectorY.z;//+1;
 			
+			vectorY.applyAxisAngle (vectorX, -Math.PI/4);
 			vectorNulo.x = mainWeapon.position.x + vectorY.x*2;
 			vectorNulo.y = mainWeapon.position.y + vectorY.y*2;
 			vectorNulo.z = mainWeapon.position.z + vectorY.z*2;
 			
+			
 			mainWeapon.lookAt(vectorNulo);
+
 			
 		}
 		

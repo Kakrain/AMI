@@ -96,9 +96,9 @@
 			render();
 			
 			function loadHalberdiers(){
-				lanzaMatico = new WeaponMatico("models/lanzainca.js",scene);
-				body = new BodyMatico("models/marine_anims.js",scene,ambiente);
-				body2 = new BodyMatico("models/marine_anims.js",scene,ambiente);
+				lanzaMatico = new WeaponMatico("models/lanzainca2.js",scene);
+				body = new BodyMatico("models/inca.js",scene,ambiente);
+				body2 = new BodyMatico("models/inca.js",scene,ambiente);
 				var worker = new Worker('js/worker.js');
 					worker.postMessage("marco");
 					worker.addEventListener('message', function(e) {
