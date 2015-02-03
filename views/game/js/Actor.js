@@ -1,14 +1,13 @@
 function Actor (_body,scene,_ambiente,_enemies,_allies) {
-	
+	var self=this;
 	var tiempoPutrefaccion = 2,
 		patrulla     = [],
 		ipatrulla    = 0,
 		sign          = 1,
 		range        = 80,
-		velocity     = 3,
+		velocity     = 30,
 		ambiente   = _ambiente,
 		body        = _body,
-		mesh =body.getMesh(),
 		focus         = null,
 		destino      = null,
 		allies         = _allies,
@@ -16,24 +15,25 @@ function Actor (_body,scene,_ambiente,_enemies,_allies) {
 		arma         = null,
 		health       = 100,
 		dead         = null,
-		y               = new THREE.Vector3( 0, 1,0),
-		box           = new THREE.Box3().setFromObject(mesh),
-		altura        = (box.max.y-box.min.y)/2,
-		vector       = new THREE.Vector3( 0, 0,-1);
-	mesh.position.y = altura;
+		y               = new THREE.Vector3( 0, 1,0);
+		var mesh =body.getMesh();
+		var radius=mesh.geometry.boundingSphere.radius;
+		
+		//box           = new THREE.Box3().setFromObject(mesh),
+		//altura        = radius,
+		var vector       = new THREE.Vector3( 0, 0,-1);
+	mesh.position.y = radius;
 	this.accion = null;   
 	vector.applyQuaternion(mesh.quaternion);
 	var vision = new THREE.Raycaster(mesh.position, vector, 1, range);
 	allies.splice(1,0,this);
-
 this.setPosition=function(x,y,z){
 	mesh.position.x=x;
 	mesh.position.y=y;
 	mesh.position.z=z;
 }
 this.setAzimut=function(angle){
-	//$.notify("vec: "+mesh.rotation.x);
-	//mesh.rotation.applyAxisAngle(y,angle);
+	mesh.rotation.applyAxisAngle(y,angle);
 }
 	var advancePatrolPosition = function(){
 		if(patrulla.length<2){return;}
@@ -45,6 +45,7 @@ this.setAzimut=function(angle){
 	}
 
 	this.addPatrolPosition = function(vector){
+		createSphere(vector.x,vector.y,vector.z,'red');
 		patrulla[patrulla.length] = vector;
 	}
 
@@ -97,7 +98,8 @@ this.setAzimut=function(angle){
 	}
 	
 	this.dentroRangoAtaque = function(enemy){
-		return mesh.position.distanceTo(enemy.getMesh().position) <= arma.getRange();
+		//return mesh.position.distanceTo(enemy.getMesh().position) <= arma.getRange();
+		return false;
 	} 
 	
 	this.observar = function(){
@@ -119,7 +121,12 @@ this.setAzimut=function(angle){
 	}
 
 	this.animar = function(dt){
+		body.update(dt);
 		this.accion(dt);
+	}
+	this.setMover=function(){
+		mesh.setWalking(true);
+		this.accion = this.mover;
 	}
 
 	this.idle = function(){
@@ -130,7 +137,8 @@ this.setAzimut=function(angle){
 			return;
 		}
 		if(destino != null || patrulla.length != 0){
-			this.accion = this.mover;
+			//this.accion = this.mover;
+			self.setMover();
 		}
 	}
 	
@@ -147,7 +155,8 @@ this.setAzimut=function(angle){
 				this.accion = this.idle;
 			}
 		}else{
-			this.accion = this.mover;
+			//this.accion = this.mover;
+			self.setMover();
 		}
 	}
 
@@ -176,22 +185,31 @@ this.setAzimut=function(angle){
 	}
 
 	this.goTo = function(dt,position){
-		position.y = mesh.position.y;
+		mesh.destino=position;
+		return (position.distanceTo(mesh.position)<=mesh.geometry.boundingSphere.radius*0.1);
+		//if()
+		/*position.y = mesh.position.y;
 		mesh.lookAt(position);
+		//mesh.rotation.y+=Math.PI/2;//Math.PI;
 		var vector = new THREE.Vector3( 0, 0, -1 );
 			vector.subVectors(position,mesh.position);
-			vector.y = 0;
-		var dist = vector.clone();
+		//	vector.y = 0;
+		/*var dist = vector.clone();
 			vector.normalize();
 			vector = vector.multiplyScalar(dt*velocity);
+		*/
+		/*
 		if(vector.length() < dist.length()){
 			mesh.position.add(vector);
-			mesh.position.y = ambiente.getYat(mesh.position) + altura;
+			mesh.position.y = ambiente.getYat(mesh.position);
 			return false;
 		}else{
 			mesh.position.add(dist);
-			mesh.position.y = ambiente.getYat(mesh.position) + altura;
+			mesh.position.y = ambiente.getYat(mesh.position);
 			return true;
 		}
+
+
+		*/
 	}
 }
