@@ -19,9 +19,14 @@ conn.on('disconnect', function(){
 conn.on('gyroscope-x', function(gValue){
 	// Up and Down
 	camera.rotation.x += 0.02*parseFloat(gValue);
+	mainWeapon.rotation.x += 0.03*parseFloat(gValue);
+	interface1.update();
 });
 conn.on('gyroscope-y', function(gValue){
+	// Left and Right
 	camera.rotation.y += 0.02*parseFloat(gValue);
+	mainWeapon.rotation.z += 0.03*parseFloat(gValue);
+	interface1.update();
 });
 conn.on('gyroscope-z', function(gValue){
 	//camera.rotation.z += 0.02*parseFloat(gValue);

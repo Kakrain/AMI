@@ -431,18 +431,23 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
             getMenuInflater().inflate(R.menu.home, menu);
             restoreActionBar();
+
+            sensibilidad = menu.getItem(0);
+            if(namespace == null)
+                sensibilidad.setEnabled(false);
+
             return true;
         }
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
+    /*@Override
     public boolean onPrepareOptionsMenu (Menu menu) {
-        sensibilidad = menu.getItem(0);
-        if(namespace == null)
-            sensibilidad.setEnabled(false);
+        try {
+
+        }catch(Exception e){}
         return true;
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

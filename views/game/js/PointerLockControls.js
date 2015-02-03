@@ -131,26 +131,25 @@ THREE.PointerLockControls = function ( camera ) {
 					var vector = new THREE.Vector3( 0, 0, -1 );
 					vector.applyQuaternion( camera.quaternion );
 					if(weapon!=null){
-						
 						weapon.position.x=camera.position.x+vector.x*0.5;
 						weapon.position.y=camera.position.y+vector.y*0.5;
 						weapon.position.z=camera.position.z+vector.z*0.5;
 					}
-					if (moveForward) { //38 up key
-					camera.position.x+=vel*vector.x*delta;
-					camera.position.z+=vel*vector.z*delta;
+					if (moveForward) { 
+						camera.position.x+=vel*vector.x*delta;
+						camera.position.z+=vel*vector.z*delta;
 				    } else if (moveBackward) { 
-					camera.position.x-=vel*vector.x*delta;
-					camera.position.z-=vel*vector.z*delta;
+						camera.position.x-=vel*vector.x*delta;
+						camera.position.z-=vel*vector.z*delta;
 				    } 
 				    vector = new THREE.Vector3( 1, 0,0);
-					vector.applyQuaternion( camera.quaternion );
-				    if (moveRight) { //39 right key
-					camera.position.x+=vel*vector.x*delta;
-					camera.position.z+=vel*vector.z*delta;
+					vector.applyQuaternion(camera.quaternion);
+				    if (moveRight) {
+						camera.position.x+=vel*vector.x*delta;
+						camera.position.z+=vel*vector.z*delta;
 				    } else if (moveLeft) { //37 left key
-					camera.position.x-=vel*vector.x*delta;
-					camera.position.z-=vel*vector.z*delta;
+						camera.position.x-=vel*vector.x*delta;
+						camera.position.z-=vel*vector.z*delta;
 				    }
 if (isOnObject === true ) {
 				velocity.y = Math.max( 0, velocity.y );
@@ -180,6 +179,31 @@ camera.position.y+=velocity.y * delta;
 				canJump = true;
 			}
 		}
+		
+		if(mainWeapon != null) {
+			var vectorZ = new THREE.Vector3( 0, 0, -1 );
+				vectorZ.applyQuaternion( camera.quaternion );
+				
+			var vectorY = new THREE.Vector3( 0 , 1 , 0 );
+				vectorY.applyQuaternion( camera.quaternion );
+			
+			var vectorX = new THREE.Vector3( 1 , 0 , 0 );
+				vectorX.applyQuaternion( camera.quaternion );
+			
+			var vectorNulo = new THREE.Vector3( 0 , 0 , 0 );
+				
+			mainWeapon.position.x = camera.position.x+vectorZ.x+vectorX.x;//+0.5;
+			mainWeapon.position.y = camera.position.y+vectorZ.y+vectorX.y;//-3.35;
+			mainWeapon.position.z = camera.position.z+vectorZ.z+vectorX.z;//+1;
+			
+			vectorNulo.x = mainWeapon.position.x + vectorY.x*2;
+			vectorNulo.y = mainWeapon.position.y + vectorY.y*2;
+			vectorNulo.z = mainWeapon.position.z + vectorY.z*2;
+			
+			mainWeapon.lookAt(vectorNulo);
+			
+		}
+		
 		prevTime = time;
 	};
 	

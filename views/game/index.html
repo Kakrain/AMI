@@ -21,8 +21,6 @@
 		<script src="js/Clock.js"></script>
 		<script src="js/AmbienteMatico.js"></script>
 		<script src="js/BlendCharacter.js"></script>
-		<!--script src="js/jdataview.js"></script-->
-		<!--script src="js/mm3d.js"></script-->
 		<script src="js/Marine.js"></script>
 		<script src="js/BodyMatico.js"></script>
 		<script src="js/Weapon.js"></script>
@@ -53,8 +51,9 @@
 				ambiente.setMar("img/map/water512.jpg");
 				ambiente.generate();	
 
-			 var lanzaMatico;
-			 var guerreroMatico;
+			var lanzaMatico;
+			var mainWeapon = null;
+			var guerreroMatico;
 			//var halberdMatico=new WeaponMatico("models/halberd.mm3d","img/textures/halberd.jpg");
 			var halberdier=null;
 			var body=null;
@@ -64,7 +63,8 @@
 			var mesh=null;
 			var enemy,ally,weapon;
 			var animation;
-loadHalberdiers();
+			
+			loadHalberdiers();
 
 			var render = function () {
 				requestAnimationFrame(render);				
@@ -94,83 +94,46 @@ loadHalberdiers();
 			setSun(scene);
 			setSpot(scene);			
 			render();
-/*
-			function loadHalberdiers(){
-				lanzaMatico=new WeaponMatico("models/m4.js",scene);
-				guerreroMatico=new BodyMatico("models/marine_anims.js",scene,ambiente);
-body=new BodyMatico("models/marine_anims.js",scene,ambiente);
-body2=new BodyMatico("models/marine_anims.js",scene,ambiente);
-				var worker = new Worker('js/worker.js');
-				worker.postMessage("marco");//usar al worker
-				worker.addEventListener('message', function(e) {
-				  if(!(guerreroMatico.isReady()&&lanzaMatico.isReady())){
-				  	//$.notify("marco");
-				  	worker.postMessage("marco");
-				  }else{
-				  	var bod=guerreroMatico.generate();
-				  	bod.addWeapon(lanzaMatico.generate());
-				  	//body2.addWeapon(lanzaMatico.generate());
-						worker.terminate();
-						weapon=new Weapon(30,10,1);
-						enemy=new Actor (bod,scene,ambiente,allies,enemies);
-						enemies[enemies.length]=enemy;
-						enemy.setPosition(60,-50,60);
-						//enemy.setAzimut(Math.PI/2);
-						//enemy.addArma(weapon,halberdMatico.generate());
-					bod=guerreroMatico.generate();
-				  	bod.addWeapon(lanzaMatico.generate());
-				
-						enemy.addPatrolPosition(new THREE.Vector3(250,0,250));
-						enemy.addPatrolPosition(new THREE.Vector3(-250,0,250));
-						enemy.addPatrolPosition(new THREE.Vector3(250,0,-250));
-						ally=new Actor (bod,scene,ambiente,enemies,allies);
-						allies[allies.length]=ally;
-						ally.setPosition(-60,-50,60);
-						//ally.addArma(weapon.clone(),halberdMatico.generate());
-				  
-				  		
-				  }
-				}, false);
-			}*/
 			
 			function loadHalberdiers(){
-				lanzaMatico=new WeaponMatico("models/lanzainca.js",scene);
-				//guerreroMatico=new BodyMatico("models/marine_anims.js",scene,ambiente);
-body=new BodyMatico("models/marine_anims.js",scene,ambiente);
-body2=new BodyMatico("models/marine_anims.js",scene,ambiente);
+				lanzaMatico = new WeaponMatico("models/lanzainca.js",scene);
+				body = new BodyMatico("models/marine_anims.js",scene,ambiente);
+				body2 = new BodyMatico("models/marine_anims.js",scene,ambiente);
 				var worker = new Worker('js/worker.js');
-				worker.postMessage("marco");//usar al worker
-				worker.addEventListener('message', function(e) {
-				  if(!(body.isReady()&&body2.isReady()&&lanzaMatico.isReady())){
-				  	//$.notify("marco");
-				  	worker.postMessage("marco");
-				  }else{
-				  	//var bod=guerreroMatico.generate();
+					worker.postMessage("marco");
+					worker.addEventListener('message', function(e) {
+				if(!(body.isReady()&&body2.isReady()&&lanzaMatico.isReady())){
+					worker.postMessage("marco");
+				}else{
 				  	body.setScale(0.15);
 				  	body2.setScale(0.15);
 				  	body.addWeapon(lanzaMatico.generate());
 				  	body2.addWeapon(lanzaMatico.generate());
 						worker.terminate();
-						weapon=new Weapon(30,10,1);
-						enemy=new Actor (body,scene,ambiente,allies,enemies);
+						weapon = new Weapon(30,10,1);
+						enemy = new Actor (body,scene,ambiente,allies,enemies);
 						enemies[enemies.length]=enemy;
 						enemy.setPosition(60,-50,60);
-						//enemy.setAzimut(Math.PI/2);
-						//enemy.addArma(weapon,halberdMatico.generate());
-					//bod=guerreroMatico.generate();
-				  	//bod.addWeapon(lanzaMatico.generate());
-				
 						enemy.addPatrolPosition(new THREE.Vector3(250,0,250));
 						enemy.addPatrolPosition(new THREE.Vector3(-250,0,250));
 						enemy.addPatrolPosition(new THREE.Vector3(250,0,-250));
 						ally=new Actor (body2,scene,ambiente,enemies,allies);
 						allies[allies.length]=ally;
 						ally.setPosition(-60,-50,60);
-						//ally.addArma(weapon.clone(),halberdMatico.generate());
-				  
-				  		
+					loadWeapon();
 				  }
 				}, false);
+			}
+			
+			function loadWeapon(){
+				mainWeapon = lanzaMatico.generate();
+				mainWeapon.scale.set(0.045,0.045,0.045);
+				mainWeapon.position.x = 0;
+				mainWeapon.position.y = -95;
+				mainWeapon.position.z = -1;
+				
+				mainWeapon.rotation.z = -29.85;
+				mainWeapon.rotation.x = -0.3;
 			}
 			
 			
@@ -178,7 +141,6 @@ body2=new BodyMatico("models/marine_anims.js",scene,ambiente);
 		<nav>
 			<ul>
 				<li><a href="#" id="username"></a></li>
-				<li><a href="/logout">Salir</a></li>
 			</ul>
 		</nav>
 		<script src="/socket.io/socket.io.js"></script>

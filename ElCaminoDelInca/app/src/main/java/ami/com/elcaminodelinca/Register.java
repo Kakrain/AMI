@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,7 +25,7 @@ import butterknife.OnClick;
 /**
  * Created by Denny on 30/12/2014.
  */
-public class Register extends Activity {
+public class Register extends ActionBarActivity {
 
     @InjectView(R.id.register_email) EditText email;
     @InjectView(R.id.register_password) EditText password;
@@ -37,10 +38,10 @@ public class Register extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
-        socketIOSetUp();
         ButterKnife.inject(this);
         dataSource = new SessionDataSource(this);
         dataSource.open();
+        socketIOSetUp();
     }
 
     public void socketIOSetUp(){
@@ -113,6 +114,7 @@ public class Register extends Activity {
                 finish();
                 Intent login = new Intent(this,Login.class);
                 startActivity(login);
+                overridePendingTransition(R.animator.pushrightin, R.animator.pushrightout);
                 return true;
         }
         return super.onOptionsItemSelected(item);

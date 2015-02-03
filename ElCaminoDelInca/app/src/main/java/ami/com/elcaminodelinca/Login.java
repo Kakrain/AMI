@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -22,7 +23,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class Login extends Activity {
+public class Login extends ActionBarActivity {
 
     @InjectView(R.id.login_email) EditText email;
     @InjectView(R.id.login_password) EditText password;
@@ -37,16 +38,16 @@ public class Login extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        socketIOSetUp();
         ButterKnife.inject(this);
         dataSource = new SessionDataSource(this);
         dataSource.open();
         register.setText(Html.fromHtml(getString(R.string.login_register)));
+        socketIOSetUp();
     }
 
     public void socketIOSetUp(){
         try {
-            socket = IO.socket(IP.ip);
+            socket = IO.socket(IP.ip+":3000");
         } catch (URISyntaxException e) {
             System.out.println("ERROR: " + e);
         }
@@ -110,6 +111,7 @@ public class Login extends Activity {
                 finish();
                 Intent register = new Intent(this,Register.class);
                 startActivity(register);
+                overridePendingTransition(R.animator.pushleftin, R.animator.pushleftout);
                 break;
         }
     }

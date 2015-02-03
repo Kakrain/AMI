@@ -17,7 +17,7 @@
         android:layout_height="60dip"
         android:hint="@string/login_email"
         android:inputType="textEmailAddress"
-        android:layout_marginTop="40dip"
+        android:layout_marginTop="20dip"
         android:textSize="@dimen/font_size_text"/>
     <EditText
         android:id="@+id/login_password"
@@ -37,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/login_register_pre"
-        android:layout_marginTop="60dip"
+        android:layout_marginTop="20dip"
         android:textSize="@dimen/font_size_text"
         android:gravity="center"/>
 
