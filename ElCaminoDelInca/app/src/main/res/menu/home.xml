@@ -2,6 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".Home">
 
-    <item android:id="@+id/action_exit" android:title="@string/action_exit"
+    <item android:id="@+id/action_sensitivity" android:title="@string/action_sensitivity"
         android:orderInCategory="100"/>
+    <item android:id="@+id/action_exit" android:title="@string/action_exit"
+        android:orderInCategory="200"/>
 </menu>

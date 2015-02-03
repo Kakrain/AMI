@@ -46,7 +46,7 @@ public class Login extends Activity {
 
     public void socketIOSetUp(){
         try {
-            socket = IO.socket(IP.ip + ":3000");
+            socket = IO.socket(IP.ip);
         } catch (URISyntaxException e) {
             System.out.println("ERROR: " + e);
         }

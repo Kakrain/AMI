@@ -1,7 +1,10 @@
 package ami.com.elcaminodelinca;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -26,6 +29,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -68,6 +72,8 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private CharSequence mTitle;
     private SessionDataSource dataSource;
+    private SettingsDataSource settingsSource;
+    private MenuItem sensibilidad;
 
 
     @Override
@@ -218,6 +224,8 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
 
         dataSource = new SessionDataSource(this);
         dataSource.open();
+        settingsSource = new SettingsDataSource(this);
+        settingsSource.open();
     }
 
     public void socketIOSetUp(){
@@ -283,6 +291,7 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
             game_controls.setVisibility(View.VISIBLE);
             mNavigationDrawerFragment.setMenuVisibility(true);
             mNavigationDrawerFragment.setUserVisibleHint(true);
+            sensibilidad.setEnabled(true);
         } else {
             namespace.emit("pause-game");
             game_controls.startAnimation(fadeOut);
@@ -291,6 +300,7 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
             game_message.setVisibility(View.VISIBLE);
             mNavigationDrawerFragment.setMenuVisibility(false);
             mNavigationDrawerFragment.setUserVisibleHint(false);
+            sensibilidad.setEnabled(false);
         }
     }
 
@@ -387,28 +397,24 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
                 try {
                     getActionBar().setTitle(mTitle);
                 }catch(Exception e){}
-                System.out.println("HEY: " + mTitle);
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
                 try {
                     getActionBar().setTitle(mTitle);
                 }catch(Exception e){}
-                System.out.println("HEY: " + mTitle);
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
                 try {
                     getActionBar().setTitle(mTitle);
                 }catch(Exception e){}
-                System.out.println("HEY: " + mTitle);
                 break;
             case 4:
                 mTitle = getString(R.string.title_section4);
                 try {
                     getActionBar().setTitle(mTitle);
                 }catch(Exception e){}
-                System.out.println("HEY: " + mTitle);
                 break;
         }
     }
@@ -431,32 +437,74 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
     }
 
     @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        sensibilidad = menu.getItem(0);
+        if(namespace == null)
+            sensibilidad.setEnabled(false);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_exit) {
-            dataSource.closeSession();
-            if(namespace != null) {
-                if (namespace.connected()) {
-                    namespace.emit("close-room");
-                    namespace.disconnect();
-                    finish();
-                    Intent main = new Intent(getApplicationContext(), Login.class);
-                    startActivity(main);
-                }else {
+        switch(item.getItemId()){
+            case R.id.action_exit:
+                dataSource.closeSession();
+                if(namespace != null) {
+                    if (namespace.connected()) {
+                        namespace.emit("close-room");
+                        namespace.disconnect();
+                        finish();
+                        Intent main = new Intent(getApplicationContext(), Login.class);
+                        startActivity(main);
+                    }else {
+                        finish();
+                        Intent main = new Intent(getApplicationContext(), Login.class);
+                        startActivity(main);
+                    }
+                }else{
                     finish();
                     Intent main = new Intent(getApplicationContext(), Login.class);
                     startActivity(main);
                 }
-            }else{
-                finish();
-                Intent main = new Intent(getApplicationContext(), Login.class);
-                startActivity(main);
-            }
-            return true;
+                break;
+            case R.id.action_sensitivity:
+                sensitiveSeekBar();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    public void sensitiveSeekBar() {
+        final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
+        final SeekBar seek = new SeekBar(this);
+        seek.setMinimumHeight(30);
+        seek.setMax(100);
+        seek.setProgress(settingsSource.getSensitivity());
+        popDialog.setIcon(android.R.drawable.ic_menu_manage);
+        popDialog.setTitle("Ajuste de Sensibilidad");
+        popDialog.setView(seek);
+
+        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                settingsSource.setSensitivity(progress);
+            }
+            public void onStartTrackingTouch(SeekBar arg0) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+        popDialog.setPositiveButton("Listo",new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        popDialog.create();
+        popDialog.show();
+    }
+
+    /*public float mapSensitivity(int progress){
+        if(progress < 50){}
+        else {}
+    }*/
 
     public static class PlaceholderFragment extends Fragment {
         private static final String ARG_SECTION_NUMBER = "section_number";
