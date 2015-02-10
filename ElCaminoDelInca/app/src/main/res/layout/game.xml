@@ -33,13 +33,15 @@
                 android:gravity="center"
                 android:textSize="@dimen/font_size_code"
                 android:layout_margin="50dip"
-                android:inputType="number"/>
+                android:inputType="number"
+                android:background="@drawable/inca_textfield_activated_holo_dark"/>
             <Button
                 android:id="@+id/game_code_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/game_code_button"
-                android:padding="@dimen/font_size_text"/>
+                android:padding="@dimen/font_size_text"
+                android:background="@drawable/inca_btn_default_focused_holo_dark"/>
             <TextView
                 android:layout_width="300dip"
                 android:layout_height="wrap_content"

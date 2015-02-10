@@ -5,7 +5,7 @@ module.exports = function(io, users) {
 	
 	io.on('connection', function(socket){	
 		
-		console.log("User connected");
+		console.log(socket.client.conn.remoteAddress + " connected");
 		
 		socket.on('validation-request', function(obj){
 			User.findOne({ 'local.email' :  obj.email }, function(err, user) {
@@ -33,35 +33,34 @@ module.exports = function(io, users) {
 		});
 		
 		socket.on('temporal-web', function (code){
-			console.log("Temporal Web: " + code);
+			console.log(" * TEMPORAL WEB: " + code);
 			if(!users.indexOf(code)){
 				users[users.length] = code;
 			}
 		});
 		
 		socket.on('temporal-mobile', function(code){
-			console.log("Temporal Mobile: " + code);
+			console.log(" * TEMPORAL MOBILE: " + code);
 			if(users.indexOf(code)){
-				console.log("Hubo un match: " + code);
+				console.log("Creating room for: " + code);
 				var room = io.of('/'+code);
 				room.on('connection', function(namespace){
-					console.log('someone connected');
+					console.log(namespace.conn.remoteAddress + ' connected to room ' + code);
 					namespace.on('resume-game',function(){
 						room.emit('resume-game','Resume Game');
-						console.log("Resume Game");	
+						console.log(" * RESUME");	
 					}).on('pause-game',function(){
 						room.emit('pause-game','Pause Game');
-						console.log("Pause Game");	
-					}).on('gyroscope-x',function(gValue){
-						room.emit('gyroscope-x',gValue);
-					}).on('gyroscope-y',function(gValue){
-						room.emit('gyroscope-y',gValue);
-					}).on('gyroscope-z',function(gValue){
-						room.emit('gyroscope-z',gValue);
+						console.log(" * PAUSE");	
+					}).on('camera-rotation-x',function(gValue){
+						room.emit('camera-rotation-x',gValue);
+					}).on('camera-rotation-y',function(gValue){
+						room.emit('camera-rotation-y',gValue);
 					}).on('attack',function(){
-						console.log('Attack');
+						console.log('ATTACK');
+						room.emit('attack');
 					}).on('block',function(){
-						console.log('Block');
+						console.log('BLOCK');
 					}).on('move-forward-down',function(){
 						room.emit('move-forward-down','Move forward down');
 					}).on('move-forward-up',function(){

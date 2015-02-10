@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="inca" parent="android:Theme.Holo">
+
+    <item name="android:editTextBackground">@drawable/inca_edit_text_holo_dark</item>
+
+    <item name="android:textColorHighlight">#99977900</item>
+    <item name="android:textSelectHandleLeft">@drawable/inca_text_select_handle_left</item>
+    <item name="android:textSelectHandleRight">@drawable/inca_text_select_handle_right</item>
+    <item name="android:textSelectHandle">@drawable/inca_text_select_handle_middle</item>
+
+    <item name="android:buttonStyle">@style/Buttoninca</item>
+
+    <item name="android:imageButtonStyle">@style/ImageButtoninca</item>
+
+    <item name="android:dropDownSpinnerStyle">@style/Spinnerinca</item>
+
+  </style>
+
+</resources>

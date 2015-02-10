@@ -62,7 +62,9 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
 
     String code;
     Socket socket, namespace;
+    Boolean namespaceConected = false;
     Boolean moveCamera = false;
+    Boolean moveWeapon = false;
     SensorManager mSensorManager;
     float mLastX, mLastY, mLastZ;
     boolean mInitialized = false;
@@ -73,15 +75,12 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
     private CharSequence mTitle;
     private SessionDataSource dataSource;
     private SettingsDataSource settingsSource;
-    private MenuItem sensibilidad;
+    //private MenuItem sensibilidad;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.game);
 
@@ -230,7 +229,7 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
 
     public void socketIOSetUp(){
         try {
-                socket = IO.socket(IP.ip + ":3000");
+            socket = IO.socket(IP.ip+":"+IP.port);
         } catch (URISyntaxException e) { e.printStackTrace(); }
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
@@ -254,13 +253,14 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
 
     public void namespaceSetUp(){
         try {
-            namespace = IO.socket(IP.ip + ":3000/" + code);
+            namespace = IO.socket(IP.ip+":"+IP.port+"/"+code);
         }catch(Exception e){}
         namespace.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 System.out.println("CONNECTED TO CUSTOM NAMESPACE!");
                 mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+                namespaceConected = true;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -276,6 +276,7 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
             @Override
             public void call(Object... args) {
                 System.out.println("DISCONNECTED FROM CUSTOM ROOM!");
+                namespaceConected = false;
             }
         });
         namespace.connect();
@@ -291,7 +292,7 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
             game_controls.setVisibility(View.VISIBLE);
             mNavigationDrawerFragment.setMenuVisibility(true);
             mNavigationDrawerFragment.setUserVisibleHint(true);
-            sensibilidad.setEnabled(true);
+            //sensibilidad.setEnabled(true);
         } else {
             namespace.emit("pause-game");
             game_controls.startAnimation(fadeOut);
@@ -300,7 +301,7 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
             game_message.setVisibility(View.VISIBLE);
             mNavigationDrawerFragment.setMenuVisibility(false);
             mNavigationDrawerFragment.setUserVisibleHint(false);
-            sensibilidad.setEnabled(false);
+            //sensibilidad.setEnabled(false);
         }
     }
 
@@ -335,21 +336,26 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
                         mLastX = x;
                         mLastY = y;
                         mLastZ = z;
-                        if (deltaX > deltaY) {
-                            if(namespace != null && namespace.connected())
+                        if (deltaY > deltaX) {
+                            if(namespaceConected) {
                                 namespace.emit("attack");
-                        }
-                        if (deltaZ > deltaY) {
-                            if (namespace != null && namespace.connected())
-                                namespace.emit("block");
+                                namespace.emit("weapon-rotation-x",Float.toString(event.values[0]));
+                                namespace.emit("weapon-rotation-y",Float.toString(event.values[2]));
+                            }
+                        } else {
+                            if(namespaceConected) {
+                                namespace.emit("weapon-rotation-x", Float.toString(event.values[0]));
+                                namespace.emit("weapon-rotation-y", Float.toString(event.values[2]));
+                            }
                         }
                     }
                     break;
                 case Sensor.TYPE_GYROSCOPE:
                     if(moveCamera) {
-                        namespace.emit("gyroscope-x",Float.toString(event.values[0]));
-                        namespace.emit("gyroscope-y",Float.toString(event.values[2]));
-                        namespace.emit("gyroscope-z",Float.toString(event.values[1]));
+                        namespace.emit("camera-rotation-x",Float.toString(event.values[0]));
+                        namespace.emit("camera-rotation-y",Float.toString(event.values[2]));
+                    } else if(moveWeapon){
+
                     }
                     break;
             }
@@ -432,9 +438,9 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
             getMenuInflater().inflate(R.menu.home, menu);
             restoreActionBar();
 
-            sensibilidad = menu.getItem(0);
+            /*sensibilidad = menu.getItem(0);
             if(namespace == null)
-                sensibilidad.setEnabled(false);
+                sensibilidad.setEnabled(false);*/
 
             return true;
         }
@@ -472,9 +478,9 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
                     startActivity(main);
                 }
                 break;
-            case R.id.action_sensitivity:
+            /*case R.id.action_sensitivity:
                 sensitiveSeekBar();
-                break;
+                break;*/
         }
         return super.onOptionsItemSelected(item);
     }

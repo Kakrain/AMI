@@ -18,20 +18,23 @@
         android:hint="@string/login_email"
         android:inputType="textEmailAddress"
         android:layout_marginTop="20dip"
-        android:textSize="@dimen/font_size_text"/>
+        android:textSize="@dimen/font_size_text"
+        android:background="@drawable/inca_textfield_activated_holo_dark"/>
     <EditText
         android:id="@+id/login_password"
         android:layout_width="match_parent"
         android:layout_height="60dip"
         android:hint="@string/login_password"
         android:inputType="textPassword"
-        android:textSize="@dimen/font_size_text"/>
+        android:textSize="@dimen/font_size_text"
+        android:background="@drawable/inca_textfield_activated_holo_dark"/>
     <Button android:id="@+id/login_enter"
         android:layout_width="fill_parent"
         android:layout_height="60dp"
         android:text="@string/login_enter"
         android:layout_marginTop="10dip"
-        android:textSize="@dimen/font_size_button"/>
+        android:textSize="@dimen/font_size_button"
+        android:background="@drawable/inca_btn_default_focused_holo_dark"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -50,6 +53,6 @@
         android:autoLink="all"
         android:text="@string/login_register"
         android:textSize="@dimen/font_size_button"
-        android:textColor="#494B4F"/>
+        android:textColor="#977900"/>
 
 </LinearLayout>

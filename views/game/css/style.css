@@ -39,3 +39,48 @@ section {
 			font-size: 1.7em;
 			margin-bottom: 30px;
 		}
+		
+footer {
+	position: fixed;
+	width: 25%;
+	height: auto;
+	border-radius: 35px;
+	bottom: 15px;
+	left: 15px;
+	border: 2px solid black;
+}
+	footer div {
+		background-color: green;
+		width: calc(100% - 10px);
+		height: 20px;
+		border-radius: 15px;
+		line-height: 22px;
+		padding-left: 10px;
+		color: white;
+	}
+	
+aside {
+	position: fixed;
+	width: 20%;
+	height: auto;
+	top: 10px;
+	left: 15px;
+}
+	aside div {
+		border: 2px solid black;
+		width: 100%;
+		height: auto;
+		margin: 5px 0;
+		border-radius: 10px;
+	}
+		aside div span {
+			width: calc(100%-15px);
+			height: 20px;
+			border-radius: 10px;
+			display: block;
+			line-height: 20px;
+			color: white;
+			padding-left: 10px;
+		}
+	#allies { background-color: #008DB5; }
+	#enemies { background-color: #B30D55; }

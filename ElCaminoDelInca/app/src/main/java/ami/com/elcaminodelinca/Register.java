@@ -46,7 +46,7 @@ public class Register extends ActionBarActivity {
 
     public void socketIOSetUp(){
         try {
-            socket = IO.socket(IP.ip+":3000");
+            socket = IO.socket(IP.ip+":"+IP.port);
         } catch (URISyntaxException e) {
             System.out.println("ERROR: " + e);
         }
