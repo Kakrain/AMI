@@ -16,17 +16,39 @@ conn.on('disconnect', function(){
 	window.location.href = href;
 });
 
+conn.on('weapon-rotation-x', function(gValue){
+	if(mainWeapon){
+		mainWeapon.position.x += 0.03*parseFloat(gValue);
+	}
+});
+conn.on('weapon-rotation-y', function(gValue){
+	if(mainWeapon){
+		mainWeapon.position.z += 0.03*parseFloat(gValue);
+	}
+});
+
 conn.on('camera-rotation-x', function(gValue){
-	// Up and Down
 	camera.rotation.x += 0.02*parseFloat(gValue);
-	mainWeapon.rotation.x += 0.03*parseFloat(gValue);
-	interface1.update();
 });
 conn.on('camera-rotation-y', function(gValue){
-	// Left and Right
 	camera.rotation.y += 0.02*parseFloat(gValue);
-	mainWeapon.rotation.z += 0.03*parseFloat(gValue);
-	interface1.update();
+});
+
+conn.on('attack', function(){
+	interface1.getControls().attack();
+});
+
+conn.on('free-hand', function(){
+	scene.remove(mainWeapon);
+});
+conn.on('sword', function(){
+	//scene.remove(mainWeapon);
+});
+conn.on('spear', function(){
+	scene.add(mainWeapon);
+});
+conn.on('arc', function(){
+	//scene.remove(mainWeapon);
 });
 
 conn.on('move-forward-down', function(msg){

@@ -23,6 +23,10 @@ function Interfaz (camera,scene) {
 		controls.update();
 	}
 	
+	this.getControls = function(){
+		return controls;
+	}
+	
 	this.enabled = function(){
 		return controls.enabled;
 	}

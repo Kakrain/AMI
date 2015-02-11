@@ -51,7 +51,7 @@ footer {
 }
 	footer div {
 		background-color: green;
-		width: calc(100% - 10px);
+		width: calc(60% - 10px);
 		height: 20px;
 		border-radius: 15px;
 		line-height: 22px;
@@ -74,13 +74,13 @@ aside {
 		border-radius: 10px;
 	}
 		aside div span {
-			width: calc(100%-15px);
 			height: 20px;
 			border-radius: 10px;
 			display: block;
 			line-height: 20px;
 			color: white;
 			padding-left: 10px;
+			width: calc(100%-15px);
 		}
-	#allies { background-color: #008DB5; }
-	#enemies { background-color: #B30D55; }
+	#allies { background-color: #008DB5;  }
+	#enemies { background-color: #B30D55;  }

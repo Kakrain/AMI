@@ -11,6 +11,12 @@ THREE.PointerLockControls = function ( camera ) {
 			altura       = 20;
 	camera.rotation.set( 0, 0, 0 );
 	pitchObject.add( camera );
+	
+	var vectorZ = new THREE.Vector3( 0, 0, -1 );
+	var vectorY = new THREE.Vector3( 0 , 1 , 0 );
+	var vectorX = new THREE.Vector3( 1 , 0 , 0 );
+	var vectorNulo = new THREE.Vector3( 0 , 0 , 0 );
+	
 	var moveForward   = false;
 	var moveBackward = false;
 	var moveLeft          = false;
@@ -24,13 +30,21 @@ THREE.PointerLockControls = function ( camera ) {
 	var velocity      = new THREE.Vector3();
 	var PI_2          = Math.PI / 2;
 	camera.rotation.order = "YXZ";
-	//camera.up = new THREE.Vector3(0,0,1);
+	var swingAngle=0;
+	var swingVel=Math.PI*1.3;
+	var swingMax=Math.PI/2;
+	var attacking=false;
+	var orientation=0;
 
 	this.setAmbiente = function(_ambiente){
 		Ambiente = _ambiente;
 	}
 	this.setWeapon=function(w){
 	weapon=w;
+	}
+	
+	this.attack = function(){
+		attacking = true;
 	}
 	
 	var onMouseMove = function ( event ) {
@@ -183,30 +197,33 @@ camera.position.y+=velocity.y * delta;
 		}
 		
 		if(mainWeapon != null) {
-			var vectorZ = new THREE.Vector3( 0, 0, -1 );
-				vectorZ.applyQuaternion( camera.quaternion );
-				
-			var vectorY = new THREE.Vector3( 0 , 1 , 0 );
-				vectorY.applyQuaternion( camera.quaternion );
-			
-			var vectorX = new THREE.Vector3( 1 , 0 , 0 );
-				vectorX.applyQuaternion( camera.quaternion );
-
-			var vectorNulo = new THREE.Vector3( 0 , 0 , 0 );
-				
+			vectorZ.set(0,0,-1);
+			vectorY.set(0,1,0);
+			vectorX.set(1,0,0);
+			vectorNulo.set(0,0,0);
+			vectorZ.applyQuaternion( camera.quaternion );
+			vectorY.applyQuaternion( camera.quaternion );
+			vectorX.applyQuaternion( camera.quaternion );
 			mainWeapon.position.x = camera.position.x+vectorZ.x*0.8+vectorX.x*0.8-vectorY.x;//+0.5;
 			mainWeapon.position.y = camera.position.y+vectorZ.y*0.8+vectorX.y*0.8-vectorY.y;//-3.35;
 			mainWeapon.position.z = camera.position.z+vectorZ.z*0.8+vectorX.z*0.8-vectorY.z;//+1;
-			
-			vectorY.applyAxisAngle (vectorX, -Math.PI/4);
+			var angle=-Math.PI/4;
+
+			if(attacking){
+				swingAngle-=swingVel*delta;
+				
+				angle+=swingAngle;
+				if(swingAngle<-swingMax){
+				swingAngle=0;
+				attacking=false;
+				}	
+			}
+			vectorY.applyAxisAngle (vectorX,angle);
+			vectorY.applyAxisAngle (vectorZ,orientation);
 			vectorNulo.x = mainWeapon.position.x + vectorY.x*2;
 			vectorNulo.y = mainWeapon.position.y + vectorY.y*2;
 			vectorNulo.z = mainWeapon.position.z + vectorY.z*2;
-			
-			
 			mainWeapon.lookAt(vectorNulo);
-
-			
 		}
 		
 		prevTime = time;

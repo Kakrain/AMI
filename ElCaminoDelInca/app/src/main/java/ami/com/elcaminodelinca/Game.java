@@ -402,24 +402,28 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
                 mTitle = getString(R.string.app_name);
                 try {
                     getActionBar().setTitle(mTitle);
+                    namespace.emit("free-hand");
                 }catch(Exception e){}
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
                 try {
                     getActionBar().setTitle(mTitle);
+                    namespace.emit("sword");
                 }catch(Exception e){}
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
                 try {
                     getActionBar().setTitle(mTitle);
+                    namespace.emit("spear");
                 }catch(Exception e){}
                 break;
             case 4:
                 mTitle = getString(R.string.title_section4);
                 try {
                     getActionBar().setTitle(mTitle);
+                    namespace.emit("arc");
                 }catch(Exception e){}
                 break;
         }
