@@ -1,8 +1,7 @@
 function init(){
-	$('#playnow').click(function(){
-		$('#playnow-container').fadeOut('fast', function(){
+	$('.showCode').click(function(){
 			generateCode();
-			$('#instructions').fadeIn('fast');
+			$('#container').fadeIn('fast');
 			var conn = io.connect("http://localhost:8080",{transports: ['websocket', 'polling', 'flashsocket']});
 			conn.emit('temporal-web',$('#code h1').html());
 			conn.on('match-correct', function(code){
@@ -14,7 +13,9 @@ function init(){
 					window.location.href = href;
 				}
 			});
-		});
+	});
+	$('#container').click(function(){
+		$(this).fadeOut();
 	});
 }
 

@@ -2,14 +2,160 @@
 <html>
 	<head>
 		<title>El Camino del Inca</title>
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+		<link href='http://fonts.googleapis.com/css?family=Playfair+Display+SC' rel='stylesheet' type='text/css'>
+		<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="img/favicon.ico" type="image/x-icon">
 		<style>
-			body { padding-top:80px;background-color:#D9D9D9 }
-			#instructions {display:none}
+			html, body{
+				margin:0;
+				padding:0;
+			}
+			body { 
+				padding-top:80px;background-color:#D9D9D9;
+				font-family: 'Playfair Display SC', serif;
+			}
+			header {
+				position: fixed;
+				top: 0;
+				left: 0;
+				height: auto;
+				padding: 15px 25px;
+				width: 100%;
+				background-color: #8E780C;
+				-webkit-box-shadow: 0px 3px 5px #797979;
+				-moz-box-shadow: 0px 1px 1px #797979;
+				box-shadow: 0px 1px 1px #797979;
+			}
+				header img {
+					height: 40px;
+					vertical-align: middle;
+					display: inline-block;
+					margin-right: 20px;
+				}
+				header h1 {
+					display: inline-block;
+					padding: 0;
+					margin: 0;
+					vertical-align: middle;
+					color: white;
+					font-family: 'Playfair Display SC', serif;
+				}
+			#main { 
+				text-align: center;
+				padding-bottom: 250px;
+			}
+			section {
+				width: 100%;
+				display: block;
+			}
+				section article {
+					width: 100%;
+					display: block;
+					padding: 40px 0;
+				}
+			#main p {
+				font-size: 2em;
+				width: 80%;
+				height: auto;
+				margin: 0 auto;
+				padding-top: 50px;
+				display: block;
+				text-shadow: black 0.02em 0.02em 0.05em;
+			}
+			#playnow {
+				color: white;
+				font-size: 2em;
+				padding: 20px;
+				border-radius: 10px;
+				text-decoration: none;
+				cursor: pointer;
+				display: inline-block;
+				margin-top: 50px;
+				background-color: #8E780C;
+				text-shadow: white 0.02em 0.02em 0.05em;
+			}
+			#playnow:hover { background-color:#6C5B09;}
+			
+			#app {
+				text-align:center;
+				background:#B2B2B2;
+				padding-top:200px;
+			}
+				#app img {
+					margin-top:-350px;
+				}
+			
+			#sensors img {
+				vertical-align: middle;
+				display: inline-block;
+				width: 35%;
+				margin: 0 10%;
+			}
+			#sensors p {
+				width: 30%;
+				text-align:center;
+				font-size: 2em;
+				margin-right: 10%;
+				vertical-align: middle;
+				display: inline-block;
+				text-shadow: black 0.02em 0.02em 0.05em;
+			}
+			
+			#devs {
+				background:#B2B2B2;
+				text-align: center;
+			}
+				#devs h2 {
+					width: 85%;
+					text-align: left;
+					margin: 20px auto 30px auto;
+					text-shadow: black 0.02em 0.02em 0.05em;
+				}
+				#devs div {
+					display: inline-block;
+					width: auto;
+					margin: 0 5%;
+				}
+					#devs div img {
+						display: inline-block;
+						vertical-align: middle;
+						width: 200px;
+						border-radius: 125px;
+						border: 3px solid #8E780C; 
+					}
+			
+			footer {
+				background: #555555;
+				color: white;
+				padding: 30px;
+				text-align: center;
+			}
+				footer p {
+					width: 80%;
+					margin: 0 auto;
+				}
+			
+			#container {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0,0,0,0.7);
+				display: none;
+			}
+			#instructions {
+				background: white;
+				width: 80%;
+				margin: 10%;
+				text-align: center;
+				border-radius: 10px;
+			}
 			#instructions #information {
 				display: inline-block;
 				width: 30%;
+				padding-right: 20px;
 				border-right: 3px solid #eee;
 				vertical-align: top;
 			}
@@ -19,21 +165,58 @@
 				width: 65%;
 				vertical-align: top;
 			}
-			#instructions #code h1{ display:block;text-align:center;font-size:10em;margin:50px 0;color:#A4C639; }
+			#instructions #code h1{ 
+				display:block;
+				text-align:center;
+				font-size:10em;
+				margin: -20px 0 50px 0;
+				color:#8E780C; 
+			}
+			
 		</style>
 	</head>
 	<body>
-		<div class="container">
-			<div class="jumbotron text-center">
-				<h1><span class="fa fa-android"></span> El Camino del Inca</h1>
-			</div>
-			<div class="text-center" id="playnow-container">
-				<a class="btn btn-primary btn-lg" id="playnow"><span class="fa fa-gamepad"></span> Jugar Ahora</a>
-			</div>
+		<header>
+			<img src="./img/logo.png">
+			<h1>El Camino del Inca</h1>
+		</header>
+		<section>
+			<article id="main">
+				<p>&iexcl;Revela los misterios de una historia como nunca antes!</p>
+				<a id="playnow" class="showCode">Jugar Ahora</a>
+			</article>
+			<article id="app">
+				<img src="img/main.png">
+				<h3>Descarga la apliaci&oacute;n y empieza el juego <span class="showCode" style="color:#8E780C;cursor:pointer;">ahora<span>.</h3>
+			</article>
+			<article id="sensors">
+				<img src="img/side.png">
+				<p>Explora el ambiente del juego y enfr&eacute;ntate a tus oponentes utilizando los sensores de tu m&oacute;vil.</p>
+			</article>
+			<article id="devs">
+				<h2>Desarrolladores:</h2>
+				<div>
+					<img src="img/david.jpg">
+					<h3 style="margin:0;">David Barrera</h3>
+					<h5 style="margin:0;">davalbar@espol.edu.ec</h5>
+					<h5 style="margin:0;">Estudiante de Ing. en Ciencias Computacionales</h5>
+				</div>
+				<div>
+					<img src="img/denny.jpg">
+					<h3 style="margin:0;">Denny Schuldt</h3>
+					<h5 style="margin:0;">dschuldt@espol.edu.ec</h5>
+					<h5 style="margin:0;">Estudiante de Ing. en Ciencias Computacionales</h5>
+				</div>
+			</article>
+		</section>
+		<footer>
+			<p>El Camino del Inca es un proyecto desarrollado para el curso de Aplicaciones Multimedia Interactiva, dictado por el Dr. Dennis Romero en la Escuela Superior Polit&eacute;cnica del Litoral.<br>2014 - II T&eacute;rmino.</p>
+		</footer>
+		<div id="container">	
 			<div class="text-center" id="instructions">
 				<div id="information">
 					<h2>1 - Descarga la app y reg&iacute;strate:</h2>
-					<img src="./imga/generate.png">
+					<img src="./img/generate.png">
 				</div>
 				<div id="code">
 					<h2>2 - Ingresa el siguiente código en la aplicaci&oacute;n:</h2>
