@@ -68,6 +68,7 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
     SensorManager mSensorManager;
     float mLastX, mLastY, mLastZ;
     boolean mInitialized = false;
+    boolean mediaInit = true;
     final float NOISE = (float) 18.0;
     Animation fadeIn = null;
     Animation fadeOut = null;
@@ -286,6 +287,10 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
     public void switchAction(boolean isOn){
         if (isOn) {
             namespace.emit("resume-game");
+            if(mediaInit) {
+                namespace.emit("mediaInit-disable");
+                mediaInit = false;
+            }
             game_message.startAnimation(fadeOut);
             game_message.setVisibility(View.GONE);
             game_controls.startAnimation(fadeIn);

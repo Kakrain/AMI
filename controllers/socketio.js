@@ -52,6 +52,8 @@ module.exports = function(io, users) {
 					}).on('pause-game',function(){
 						room.emit('pause-game','Pause Game');
 						console.log(" * PAUSE");	
+					}).on('mediaInit-disable',function(){
+						room.emit('mediaInit-disable');
 					}).on('camera-rotation-x',function(gValue){
 						room.emit('camera-rotation-x',gValue);
 					}).on('camera-rotation-y',function(gValue){

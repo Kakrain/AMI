@@ -5,9 +5,16 @@ var conn = io(":8080/"+room);
 conn.on('resume-game', function(msg){
 	interface1.enableControls();
 	$('section').fadeOut();
+	$('footer').fadeIn();
+	$('aside').fadeIn();
 });	
 conn.on('pause-game',function(msg){
 	interface1.disableControls();
+});
+
+conn.on('mediaInit-disable',function(msg){
+	$('#mediaInit').trigger('stop');
+	$('#mediaContinue').trigger('play');
 });
 conn.on('disconnect', function(){	
 	var href = window.location.href;
