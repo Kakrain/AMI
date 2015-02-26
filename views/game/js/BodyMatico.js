@@ -8,11 +8,12 @@ function BodyMatico(url,_scene,_ambiente){
 	var mat=null;
 	var skinnedMesh=null;
 	var loader = new THREE.JSONLoader();
-
+	this.material;
+	this.geometry;
 	loader.load( url, function(geometry,materials){
 		var originalMaterial = materials[ 0 ];
 		   originalMaterial.skinning = true;
-		   skinnedMesh = new THREE.Marine( geometry, materials[ 0 ], true ,ambiente);
+		   skinnedMesh = new THREE.Marine( geometry, materials[ 0 ] ,ambiente);
 		   skinnedMesh.castShadow = true;
 		   skinnedMesh.receiveShadow = true;
 		   g=geometry;
@@ -25,7 +26,7 @@ function BodyMatico(url,_scene,_ambiente){
 		skinnedMesh.scale.set(scale,scale,scale);
 	}
 this.generate=function(){
-		   var mesh = new THREE.Marine( g, mat[0], true ,ambiente);
+		   var mesh = new THREE.Marine( g, mat[0] ,ambiente);
 		   mesh.castShadow = true;
 		   mesh.receiveShadow = true;
 	        scene.add( mesh );
@@ -36,35 +37,19 @@ this.getMesh=function(){
 }
 this.update=function(dt){
 	skinnedMesh.update( dt );
-
 }
-function onCharacterLoaded(geometry, materials) {
-
-   
-       /* var loader = new THREE.JSONLoader();
-        loader.load( "models/m4.js", function(geometry,materials){
-        	gunMesh = new THREE.Mesh( geometry, materials[0] );
-	        scene.add( gunMesh );
-			skinnedMesh.addWeapon(gunMesh);
-	        
-        } );
-*/
-		
-
-
-      }
-    this.addWeapon=function(mesh){
-    	skinnedMesh.addWeapon(mesh);
-    }
-
 	this.isReady=function(){
 		return ready;
 	}
 }
-function WeaponMatico(url,_scene){
+
+function WeaponMatico(url,_scene,_dano,_rango,_cadencia){
 	var ready=false;
 	var scene=_scene;
 	var g=null;
+	var dano=_dano;
+	var rango=_rango;
+	var cadencia=_cadencia;
 	var mat=null;
 	var scale=1;
 	this.setScale=function(s){
@@ -78,23 +63,23 @@ function WeaponMatico(url,_scene){
         	ready=true;
 		});
 	this.generate=function(){
-		var weapon=new THREE.Mesh( g.clone(), mat.clone() );
-		weapon.scale.set(scale,scale,scale);
-		scene.add(weapon);
-		return weapon;
-	}
-
+		var mesh=new THREE.Mesh( g.clone(),mat.clone() );
+		mesh.scale.set(scale,scale,scale);
+		scene.add(mesh);
+		return new Weapon(mesh,dano,rango,cadencia);
+		}
 	this.isReady=function(){
 		return ready;
 	}
-}
+	}
+
 function Body(url,_scene,_scale){
 	var scene=_scene;
 	var scale=_scale;
 	var mesh;
 	var ready=false;
 	var radius=null;
-	mesh = new THREE.BlendCharacter();
+	var mesh = new THREE.BlendCharacter;
 	mesh.load( url, 
 function() {
 				//mesh.rotation.y = Math.PI * -135 / 180;
@@ -106,13 +91,9 @@ function() {
 				mesh.scale.set(scale,scale,scale);
 				scene.add( mesh );				
 				var aspect = window.innerWidth / window.innerHeight;
-
-
+				mesh.geometry.computeBoundingSphere ();
 				radius = mesh.geometry.boundingSphere.radius;
-				//mesh.geometry.applyMatrix( new THREE.Matrix4().makeTranslation(0.5,0,0));		
-				//mesh.geometry.applyMatrix( new THREE.Matrix4().makeRotationAxis ( new THREE.Vector3( 1, -1, 1 ), Math.PI ));	
-				//mesh.rotation.set(0, Math.PI, 0); // Set initial rotation	
-				mesh.play('run', 1);
+				//mesh.play('run', 1);
 				ready=true;
 			}
 
@@ -127,105 +108,11 @@ this.isReady=function(){
 this.getMesh=function(){
 	return mesh;
 }
-
+this.setScale=function(s){
+		scale=s;
+		mesh.scale.set(scale,scale,scale);
+	}
 this.update=function(dt){
 	mesh.update(dt);
-	/*for(var i = 0; i < skinboxes.length; i++)
-		{
-			skinboxes[i].position.copy(mesh.skeleton.bones[i].position);
-			skinboxes[i].rotation.copy(mesh.skeleton.bones[i].rotation);
-		}*/
 }
-this.addWeapon=function(mesh){
-	//skinboxes[13].add(mesh);
-}
-/*
-this.getMesh=function(){
-	return mesh;
-}
-this.getBoxes=function(){
-	return skinboxes;
-}
-this.calmarse=function(){
-		animations[2].stop();
-		animations[4].play();
-		var worker = new Worker('worker.js');
-		worker.postMessage("marco");//usar al worker
-		worker.addEventListener('message', function(e) {
-		  if(animations[4].isPlaying){
-		  	worker.postMessage("marco");
-		  }else{
-		  	animations[1].play();
-		  	worker.terminate();
-		  }
-		}, false);
-	}
-	this.alarmarse=function(){
-		animations[1].stop();
-		animations[3].play();
-		var worker = new Worker('worker.js');
-		worker.postMessage("marco");//usar al worker
-		worker.addEventListener('message', function(e) {
-		  if(animations[3].isPlaying){
-		  	worker.postMessage("marco");
-		  }else{
-		  	animations[2].play();
-		  	worker.terminate();
-		  }
-		}, false);
-	}
-	this.atacar=function(){
-		animations[1].stop();
-		animations[2].stop();
-		if(Math.random()>=0.5){
-			this.swing();
-		}else{
-			this.stab();
-		}
-	}
-	this.swing=function(){
-		animations[5].play();
-			var worker = new Worker('worker.js');
-			worker.postMessage("marco");//usar al worker
-			worker.addEventListener('message', function(e) {
-			  if(animations[5].isPlaying){
-			  	worker.postMessage("marco");
-			  }else{
-			  	animations[6].play();
-			  	worker.terminate();
-			  }
-			}, false);
-	}
-	this.stab=function(){
-		animations[9].play();
-		var worker = new Worker('worker.js');
-		worker.postMessage("marco");//usar al worker
-		worker.addEventListener('message', function(e) {
-		  if(animations[9].isPlaying){
-		  	worker.postMessage("marco");
-		  }else{
-		  	animations[10].play();
-		  	worker.terminate();
-		  }
-		}, false);
-	}
-	this.block=function(){
-		animations[1].stop();
-		animations[2].stop();
-		animations[8].play();
-	}
-	this.gostop=function(){
-		if(animations[0].isPlaying){
-			animations[0].stop();
-			return;
-		}
-		animations[0].play();
-	}
-	this.walk=function(){
-		animations[0].play();
-	}
-	this.stopwalk=function(){
-		animations[0].stop();
-	}
-	*/
 }

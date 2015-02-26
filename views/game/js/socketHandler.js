@@ -4,7 +4,7 @@ var conn = io(":8080/"+room);
 
 conn.on('resume-game', function(msg){
 	interface1.enableControls();
-	$('section').fadeOut();
+	$('#start').fadeOut();
 	$('footer').fadeIn();
 	$('aside').fadeIn();
 });	
@@ -13,7 +13,7 @@ conn.on('pause-game',function(msg){
 });
 
 conn.on('mediaInit-disable',function(msg){
-	$('#mediaInit').trigger('stop');
+	$('#mediaInit').trigger('pause');
 	$('#mediaContinue').trigger('play');
 });
 conn.on('disconnect', function(){	
@@ -23,22 +23,21 @@ conn.on('disconnect', function(){
 	window.location.href = href;
 });
 
-conn.on('weapon-rotation-x', function(gValue){
-	if(mainWeapon){
-		mainWeapon.position.x += 0.03*parseFloat(gValue);
-	}
-});
-conn.on('weapon-rotation-y', function(gValue){
-	if(mainWeapon){
-		mainWeapon.position.z += 0.03*parseFloat(gValue);
-	}
+conn.on('camera-rotation-x', function(gValue){
+	if(interface1.getControls().Actor==null){
+		camera.rotation.x += 0.02*parseFloat(gValue);
+	}else{
+		interface1.getControls().h -= 0.02*parseFloat(gValue)*30;
+		interface1.getControls().h = Math.max(Math.min(interface1.getControls().h,interface1.getControls().Z-0.1),0.1-interface1.getControls().Z);
+	}	
 });
 
-conn.on('camera-rotation-x', function(gValue){
-	camera.rotation.x += 0.02*parseFloat(gValue);
-});
 conn.on('camera-rotation-y', function(gValue){
-	camera.rotation.y += 0.02*parseFloat(gValue);
+	if(interface1.getControls().Actor==null){
+		camera.rotation.y += 0.02*parseFloat(gValue);
+	}else{
+		interface1.getControls().theta -= 0.02*parseFloat(gValue);
+	}
 });
 
 conn.on('attack', function(){
@@ -46,17 +45,12 @@ conn.on('attack', function(){
 });
 
 conn.on('free-hand', function(){
-	scene.remove(mainWeapon);
-});
-conn.on('sword', function(){
-	//scene.remove(mainWeapon);
+	interface1.getControls().Actor.mesh.getBoxes()[24].remove(interface1.getControls().Actor.mesh.getArmas()[0]);
 });
 conn.on('spear', function(){
-	scene.add(mainWeapon);
+	interface1.getControls().Actor.mesh.getBoxes()[24].add(interface1.getControls().Actor.mesh.getArmas()[0]);
 });
-conn.on('arc', function(){
-	//scene.remove(mainWeapon);
-});
+
 
 conn.on('move-forward-down', function(msg){
 	interface1.b12Down();

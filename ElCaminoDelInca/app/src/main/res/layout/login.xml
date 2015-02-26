@@ -19,6 +19,7 @@
         android:inputType="textEmailAddress"
         android:layout_marginTop="20dip"
         android:textSize="@dimen/font_size_text"
+        android:textCursorDrawable="@null"
         android:background="@drawable/inca_textfield_activated_holo_dark"/>
     <EditText
         android:id="@+id/login_password"
@@ -27,6 +28,7 @@
         android:hint="@string/login_password"
         android:inputType="textPassword"
         android:textSize="@dimen/font_size_text"
+        android:textCursorDrawable="@null"
         android:background="@drawable/inca_textfield_activated_holo_dark"/>
     <Button android:id="@+id/login_enter"
         android:layout_width="fill_parent"

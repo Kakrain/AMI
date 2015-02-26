@@ -54,6 +54,7 @@ module.exports = function(io, users) {
 						console.log(" * PAUSE");	
 					}).on('mediaInit-disable',function(){
 						room.emit('mediaInit-disable');
+						console.log(' * Disable sound');
 					}).on('camera-rotation-x',function(gValue){
 						room.emit('camera-rotation-x',gValue);
 					}).on('camera-rotation-y',function(gValue){
@@ -66,15 +67,9 @@ module.exports = function(io, users) {
 					}).on('free-hand',function(){
 						console.log(' * FREE HAND');
 						room.emit('free-hand');
-					}).on('sword',function(){
-						console.log(' * SWORD');
-						room.emit('sword');
 					}).on('spear',function(){
 						console.log(' * SPEAR');
 						room.emit('spear');
-					}).on('arc',function(){
-						console.log(' * ARC');
-						room.emit('arc');
 					}).on('move-forward-down',function(){
 						room.emit('move-forward-down','Move forward down');
 					}).on('move-forward-up',function(){

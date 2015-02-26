@@ -22,6 +22,7 @@
 				height: auto;
 				padding: 15px 25px;
 				width: 100%;
+				z-index: 100;
 				background-color: #8E780C;
 				-webkit-box-shadow: 0px 3px 5px #797979;
 				-moz-box-shadow: 0px 1px 1px #797979;
@@ -91,6 +92,12 @@
 				display: inline-block;
 				width: 35%;
 				margin: 0 10%;
+				-webkit-transition: all 250ms ease;
+				-moz-transition: all 250ms ease;
+				-webkit-transform-origin: top;
+				-moz-transform-origin: top;
+				-webkit-animation: rotate 1.5s infinite;
+				-moz-animation: rotate 1.5s infinite;
 			}
 			#sensors p {
 				width: 30%;
@@ -172,7 +179,30 @@
 				margin: -10px 0 80px 0;
 				color:#8E780C; 
 			}
-			
+
+			@-webkit-keyframes rotate { 
+				0% { -webkit-transform: rotate(0deg); }
+				5% { -webkit-transform: rotate(1deg); }
+				10% { -webkit-transform: rotate(2deg); }
+				15% { -webkit-transform: rotate(3deg); }
+				20% { -webkit-transform: rotate(4deg); }
+				25% { -webkit-transform: rotate(5deg); }
+				30% { -webkit-transform: rotate(6deg); }
+				35% { -webkit-transform: rotate(7deg); }
+				40% { -webkit-transform: rotate(8deg); }
+				45% { -webkit-transform: rotate(9deg); }
+				50% { -webkit-transform: rotate(10deg); }
+				55% { -webkit-transform: rotate(10deg); }
+				60% { -webkit-transform: rotate(9deg); }
+				65% { -webkit-transform: rotate(8deg); }
+				70% { -webkit-transform: rotate(7deg); }
+				75% { -webkit-transform: rotate(6deg); }
+				80% { -webkit-transform: rotate(5deg); }
+				85% { -webkit-transform: rotate(4deg); }
+				90% { -webkit-transform: rotate(3deg); }
+				95% { -webkit-transform: rotate(2deg); }
+				100% { -webkit-transform: rotate(1deg); }
+			}		
 		</style>
 	</head>
 	<body>
@@ -210,7 +240,7 @@
 			</article>
 		</section>
 		<footer>
-			<p>El Camino del Inca es un proyecto desarrollado para el curso de Aplicaciones Multimedia Interactiva, dictado por el Dr. Dennis Romero en la Escuela Superior Polit&eacute;cnica del Litoral.<br>2014 - II T&eacute;rmino.</p>
+			<p>El Camino del Inca es un proyecto desarrollado para el curso de Aplicaciones Multimedia Interactivas, dictado por el Dr. Dennis Romero en la Escuela Superior Polit&eacute;cnica del Litoral.<br>2014 - II T&eacute;rmino.</p>
 		</footer>
 		<div id="container">	
 			<div class="text-center" id="instructions">

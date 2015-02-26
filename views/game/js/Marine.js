@@ -1,8 +1,8 @@
-THREE.Marine = function ( geometry, material, useVertexTexture ,_ambiente) {
-
-  THREE.SkinnedMesh.call( this, geometry, material );
-this.animations = {};
-  this.weightSchedule = [];
+THREE.Marine = function ( geometry, material ,_ambiente) {
+	var self=this;
+	THREE.SkinnedMesh.call( this, geometry, material );
+	this.animations = {};
+	this.weightSchedule = [];
   this.warpSchedule = [];
   this.States = {
     UPRIGHT: 0,
@@ -14,22 +14,30 @@ this.animations = {};
   this.destino=null;
   this.currentState = this.States.UPRIGHT;
   this.nextState = this.States.NONE;
-
+  var vector=new THREE.Vector3();
   this.enableMovement = true;
-var boxes=[];
+  var boxes=[];
 var self = this;
 var armas=[];
 this.addWeapon=function(mesh){
     armas[armas.length]=mesh;
-    boxes[22].add(mesh);
+    boxes[24].add(mesh);
 }
+
+this.getBoxes = function(){
+	return boxes;
+}
+this.getArmas = function(){
+	return armas;
+}
+
 var ambiente=_ambiente;
 
   this.rotationInputAxis = 0;
   this.velocity = 0;
 
   this.aceleration = 1 / 2.5;
-  this.runUnitsPerSecond = 100;
+  this.runUnitsPerSecond = 25;
   this.rotationUnitsPerSecond = 1;
 
 for(var i = 0; i < self.skeleton.bones.length; i++)
@@ -60,22 +68,14 @@ for(var i = 0; i < self.skeleton.bones.length; i++)
 
       }
 
- /*
-  this.idleAnim = new THREE.Animation( this, "idle" );
-  this.walkAnim = new THREE.Animation( this, "walk_with_gun" );
-  this.runAnim = new THREE.Animation( this, "run_with_gun" );
-  this.kneelAnim = new THREE.Animation( this, "kneel_idle" );
-  this.kneelFiringAnim = new THREE.Animation( this, "kneel_firing" );
-  this.idleFiringAnim = new THREE.Animation( this, "idle_with_gun_firing" );
-*/
+
 this.idleAnim = this.animations[ animName ];
-//$.notify("idleanim: "+this.idleAnim,{autoHide:false});
   this.walkAnim = this.animations["walk_with_gun"];
   this.runAnim = this.animations["run_with_gun"];
   this.kneelAnim =this.animations["kneel_idle"];
   this.kneelFiringAnim = this.animations["kneel_firing"];
   this.idleFiringAnim = this.animations["idle_with_gun_firing"];
-  // Start off with the upright blend anims playing
+ 
   this.idleAnim.play(true, 0, 1);
   this.walkAnim.play(true, 0, 0);
   this.runAnim.play(true, 0, 0);
@@ -103,7 +103,7 @@ this.idleAnim = this.animations[ animName ];
 
     var axisDelta = delta * self.aceleration;
 
-    if ( self.destino!=null && self.currentState === self.States.UPRIGHT ) {
+    if ( self.forwardPressed && self.currentState === self.States.UPRIGHT ) {
       self.velocity += axisDelta;
     } else {
       // decay linearly
@@ -117,28 +117,20 @@ this.idleAnim = this.animations[ animName ];
 
   //----------------------------------------------------------------------------
   var updateMovement = function( delta ) {
-
-    if (self.destino!=null && self.enableMovement ) {
-
-      /*if ( self.currentState === self.States.UPRIGHT ) {
-
-        self.rotation.y += self.rotationInputAxis * delta;
-        self.updateMatrix();
-
-      }*/
-
+    if (self.destino!=null) {
     self.destino.y = self.position.y;
     self.lookAt(self.destino);
     self.rotation.y+=Math.PI;
-
-      var forward = self.getForward().clone();
-      var movement = self.velocity * self.runUnitsPerSecond * delta;
-
-      forward.multiplyScalar( movement );
-      self.position.add( forward );
-      self.position.y=ambiente.getYat(self.position);
-
     }
+    //if(self.forwardPressed){
+        vector.set(0,0,-1);
+        vector.applyQuaternion( self.quaternion );
+        var movement = self.velocity *self.runUnitsPerSecond* delta;
+        vector.multiplyScalar( movement );
+        self.position.add( vector );
+        self.position.y=ambiente.getYat(self.position);
+     // }
+
 
   };
 
@@ -286,8 +278,33 @@ this.idleAnim = this.animations[ animName ];
     self.nextState = self.States.NONE;
 
   };
-this.setWalking=function(flag){
-  forwardPressed = flag;
+this.setWalking=function(){
+  self.forwardPressed = true;
+  self.setAllZero();
+  self.runAnim.play(false,1,0);
+}
+this.setAttacking=function(){
+  self.setAllZero();
+  self.idleFiringAnim.play(false,1,0);
+  self.forwardPressed=false;
+}
+this.setIdle=function(flag){
+  //self.setAllZero();
+  self.idleAnim.weight=1;
+  self.forwardPressed=false;
+  //mesh.setWalking(flag);
+}
+
+this.setAllZero=function(){
+  self.runAnim.weight=0;
+  self.idleAnim.weight=0;
+  self.walkAnim.weight=0;
+  self.idleFiringAnim.weight=0;
+  
+  self.runAnim.stop( 0);
+  self.idleAnim.stop( 0);
+  self.walkAnim.stop( 0);
+  self.idleFiringAnim.stop( 0);
 }
   //----------------------------------------------------------------------------
   /*var onKeyDown = function( e ) {

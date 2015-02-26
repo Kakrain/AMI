@@ -1,4 +1,3 @@
-
 function explode(meshAr,plane,d) {
 	var vector = new THREE.Vector3( 0, 0, -1 );
 	vector.applyQuaternion( plane.quaternion );
@@ -56,7 +55,36 @@ function getPlan(v1i,v1f,v2i,v2f){
 		plan.lookAt(v);
 	return(plan);
 }
+function hasDimention(mesh){
+var box = new THREE.Box3().setFromObject(mesh);
+var tam=getDistancia(box.min.x,box.min.y,box.min.z,box.max.x,box.max.y,box.max.z);
+return !((tam == Number.POSITIVE_INFINITY)&&(tam == Number.POSITIVE_INFINITY));
+}
 
+
+function getDistancia(x1,y1,z1,x2,y2,z2){
+return Math.sqrt(Math.pow(z2-z1,2)+Math.pow(y2-y1,2)+Math.pow(x2-x1,2));
+}
+
+function intersect(mesh,plane,epsilon){
+var box = new THREE.Box3().setFromObject(plane);
+var tam=getDistancia(box.min.x,box.min.y,box.min.z,box.max.x,box.max.y,box.max.z);
+tam/=Math.sqrt(2);
+var boxP=new THREE.Mesh(new THREE.BoxGeometry( tam, tam, epsilon),new THREE.MeshLambertMaterial({color: 'red'}));
+
+var vector = new THREE.Vector3( 0, 0,-1);
+vector.applyQuaternion(plane.quaternion );
+boxP.rotation.x=plane.rotation.x;
+boxP.rotation.y=plane.rotation.y;
+boxP.rotation.z=plane.rotation.z;
+
+boxP.position.x=plane.position.x;
+boxP.position.y=plane.position.y;
+boxP.position.z=plane.position.z;
+mesh = (new ThreeBSP(mesh)).intersect((new ThreeBSP(boxP))).toMesh(mesh.material);
+mesh.geometry.computeVertexNormals();
+return hasDimention(mesh);
+}
 function drawLine(u,v,col){
 	var L = new THREE.Geometry();
 		L.vertices.push(u);

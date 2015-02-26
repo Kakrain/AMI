@@ -28,6 +28,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TableLayout;
@@ -38,11 +39,14 @@ import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
 import java.net.URISyntaxException;
+import java.sql.SQLOutput;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.InjectViews;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import butterknife.OnTouch;
 
 
 public class Game extends ActionBarActivity implements SensorEventListener, NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -50,15 +54,7 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
     TextView game_message;
     @InjectView(R.id.game_code) EditText game_code;
     @InjectView(R.id.game_controls) TableLayout game_controls;
-    @InjectView(R.id.game_move_nw) Button moveNw;
-    @InjectView(R.id.game_move_forward) Button moveForward;
-    @InjectView(R.id.game_move_no) Button moveNo;
-    @InjectView(R.id.game_move_left) Button moveLeft;
-    @InjectView(R.id.game_move_camera) Button camera;
-    @InjectView(R.id.game_move_right) Button moveRight;
-    @InjectView(R.id.game_move_sw) Button moveSw;
-    @InjectView(R.id.game_move_backward) Button moveBackward;
-    @InjectView(R.id.game_move_so) Button moveSo;
+    @InjectView(R.id.game_attack) Button game_attack;
 
     String code;
     Socket socket, namespace;
@@ -75,9 +71,6 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private CharSequence mTitle;
     private SessionDataSource dataSource;
-    private SettingsDataSource settingsSource;
-    //private MenuItem sensibilidad;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,131 +94,8 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        moveNw.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    moveCamera = true;
-                    namespace.emit("move-forward-down");
-                    namespace.emit("move-left-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    moveCamera = false;
-                    namespace.emit("move-forward-up");
-                    namespace.emit("move-left-up");
-                }
-                return false;
-            }
-        });
-        moveForward.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    moveCamera = true;
-                    namespace.emit("move-forward-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    moveCamera = false;
-                    namespace.emit("move-forward-up");
-                }
-                return false;
-            }
-        });
-        moveNo.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    moveCamera = true;
-                    namespace.emit("move-forward-down");
-                    namespace.emit("move-right-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    moveCamera = false;
-                    namespace.emit("move-forward-up");
-                    namespace.emit("move-right-up");
-                }
-                return false;
-            }
-        });
-        moveLeft.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    moveCamera = true;
-                    namespace.emit("move-left-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    moveCamera = false;
-                    namespace.emit("move-left-up");
-                }
-                return false;
-            }
-        });
-        camera.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { moveCamera = true; }
-                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { moveCamera = false; }
-                return false;
-            }
-        });
-        moveRight.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    moveCamera = true;
-                    namespace.emit("move-right-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    moveCamera = false;
-                    namespace.emit("move-right-up");
-                }
-                return false;
-            }
-        });
-        moveSw.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    moveCamera = true;
-                    namespace.emit("move-backward-down");
-                    namespace.emit("move-left-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    moveCamera = false;
-                    namespace.emit("move-backward-up");
-                    namespace.emit("move-left-up");
-                }
-                return false;
-            }
-        });
-        moveBackward.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    moveCamera = true;
-                    namespace.emit("move-backward-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    moveCamera = false;
-                    namespace.emit("move-backward-up");
-                }
-                return false;
-            }
-        });
-        moveSo.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    moveCamera = true;
-                    namespace.emit("move-backward-down");
-                    namespace.emit("move-right-down");
-                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    moveCamera = false;
-                    namespace.emit("move-backward-up");
-                    namespace.emit("move-right-up");
-                }
-                return false;
-            }
-        });
-
         dataSource = new SessionDataSource(this);
         dataSource.open();
-        settingsSource = new SettingsDataSource(this);
-        settingsSource.open();
     }
 
     public void socketIOSetUp(){
@@ -283,6 +153,106 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
         namespace.connect();
     }
 
+    @OnTouch({
+        R.id.game_move_forward_left,
+        R.id.game_move_forward,
+        R.id.game_move_forward_right,
+        R.id.game_move_left,
+        R.id.game_move_camera,
+        R.id.game_move_right,
+        R.id.game_move_backward_left,
+        R.id.game_move_backward,
+        R.id.game_move_backward_right})
+    public boolean touckListener(View view, MotionEvent motionEvent){
+        switch(view.getId()){
+            case R.id.game_move_forward_left:
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-forward-down");
+                    namespace.emit("move-left-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-forward-up");
+                    namespace.emit("move-left-up");
+                }
+                break;
+            case R.id.game_move_forward:
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-forward-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-forward-up");
+                }
+                break;
+            case R.id.game_move_forward_right:
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-forward-down");
+                    namespace.emit("move-right-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-forward-up");
+                    namespace.emit("move-right-up");
+                }
+                break;
+            case R.id.game_move_left:
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-left-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-left-up");
+                }
+                break;
+            case R.id.game_move_camera:
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { moveCamera = true; }
+                else if (motionEvent.getAction() == MotionEvent.ACTION_UP) { moveCamera = false; }
+                break;
+            case R.id.game_move_right:
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-right-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-right-up");
+                }
+                break;
+            case R.id.game_move_backward_left:
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-backward-down");
+                    namespace.emit("move-left-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-backward-up");
+                    namespace.emit("move-left-up");
+                }
+                break;
+            case R.id.game_move_backward:
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-backward-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-backward-up");
+                }
+                break;
+            case R.id.game_move_backward_right:
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    moveCamera = true;
+                    namespace.emit("move-backward-down");
+                    namespace.emit("move-right-down");
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    moveCamera = false;
+                    namespace.emit("move-backward-up");
+                    namespace.emit("move-right-up");
+                }
+                break;
+        }
+        return false;
+    }
+
     @OnCheckedChanged(R.id.game_switch)
     public void switchAction(boolean isOn){
         if (isOn) {
@@ -295,26 +265,35 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
             game_message.setVisibility(View.GONE);
             game_controls.startAnimation(fadeIn);
             game_controls.setVisibility(View.VISIBLE);
+            game_attack.startAnimation(fadeIn);
+            game_attack.setVisibility(View.VISIBLE);
             mNavigationDrawerFragment.setMenuVisibility(true);
             mNavigationDrawerFragment.setUserVisibleHint(true);
-            //sensibilidad.setEnabled(true);
         } else {
             namespace.emit("pause-game");
             game_controls.startAnimation(fadeOut);
             game_controls.setVisibility(View.GONE);
+            game_attack.startAnimation(fadeOut);
+            game_attack.setVisibility(View.GONE);
             game_message.startAnimation(fadeIn);
             game_message.setVisibility(View.VISIBLE);
             mNavigationDrawerFragment.setMenuVisibility(false);
             mNavigationDrawerFragment.setUserVisibleHint(false);
-            //sensibilidad.setEnabled(false);
         }
     }
 
-    @OnClick(R.id.game_code_button)
-    public void click(){
-        code = game_code.getText().toString();
-        if(code.length()==5) {
-            socket.emit("temporal-mobile",code);
+    @OnClick({R.id.game_code_button,R.id.game_attack})
+    public void click(Button b){
+        switch(b.getId()){
+            case R.id.game_code_button:
+                code = game_code.getText().toString();
+                if(code.length()==5) {
+                    socket.emit("temporal-mobile",code);
+                }
+                break;
+            case R.id.game_attack:
+                namespace.emit("attack");
+                break;
         }
     }
 
@@ -322,7 +301,7 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
     public void onSensorChanged(SensorEvent event) {
         synchronized (this) {
             switch (event.sensor.getType()){
-                case Sensor.TYPE_ACCELEROMETER:
+                /*case Sensor.TYPE_ACCELEROMETER:
                     float x = event.values[0];
                     float y = event.values[1];
                     float z = event.values[2];
@@ -343,7 +322,6 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
                         mLastZ = z;
                         if (deltaY > deltaX) {
                             if(namespaceConected) {
-                                namespace.emit("attack");
                                 namespace.emit("weapon-rotation-x",Float.toString(event.values[0]));
                                 namespace.emit("weapon-rotation-y",Float.toString(event.values[2]));
                             }
@@ -354,13 +332,15 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
                             }
                         }
                     }
-                    break;
+                    break;*/
                 case Sensor.TYPE_GYROSCOPE:
-                    if(moveCamera) {
-                        namespace.emit("camera-rotation-x",Float.toString(event.values[0]));
-                        namespace.emit("camera-rotation-y",Float.toString(event.values[2]));
-                    } else if(moveWeapon){
-
+                    try{
+                        if(moveCamera) {
+                            namespace.emit("camera-rotation-x", Float.toString(event.values[0]));
+                            namespace.emit("camera-rotation-y", Float.toString(event.values[2]));
+                        }
+                    }catch(Exception e){
+                        System.out.println("Error enviando datos de la cámara.");
                     }
                     break;
             }
@@ -398,38 +378,18 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        onSectionAttached(position+1);
+        onSectionAttached(position);
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
-            case 1:
-                mTitle = getString(R.string.app_name);
-                try {
-                    getActionBar().setTitle(mTitle);
+            case 0:
+                if(namespace != null)
                     namespace.emit("free-hand");
-                }catch(Exception e){}
                 break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                try {
-                    getActionBar().setTitle(mTitle);
-                    namespace.emit("sword");
-                }catch(Exception e){}
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                try {
-                    getActionBar().setTitle(mTitle);
+            case 1:
+                if(namespace != null)
                     namespace.emit("spear");
-                }catch(Exception e){}
-                break;
-            case 4:
-                mTitle = getString(R.string.title_section4);
-                try {
-                    getActionBar().setTitle(mTitle);
-                    namespace.emit("arc");
-                }catch(Exception e){}
                 break;
         }
     }
@@ -446,23 +406,10 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
             getMenuInflater().inflate(R.menu.home, menu);
             restoreActionBar();
-
-            /*sensibilidad = menu.getItem(0);
-            if(namespace == null)
-                sensibilidad.setEnabled(false);*/
-
             return true;
         }
         return super.onCreateOptionsMenu(menu);
     }
-
-    /*@Override
-    public boolean onPrepareOptionsMenu (Menu menu) {
-        try {
-
-        }catch(Exception e){}
-        return true;
-    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -487,44 +434,9 @@ public class Game extends ActionBarActivity implements SensorEventListener, Navi
                     startActivity(main);
                 }
                 break;
-            /*case R.id.action_sensitivity:
-                sensitiveSeekBar();
-                break;*/
         }
         return super.onOptionsItemSelected(item);
     }
-
-    public void sensitiveSeekBar() {
-        final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
-        final SeekBar seek = new SeekBar(this);
-        seek.setMinimumHeight(30);
-        seek.setMax(100);
-        seek.setProgress(settingsSource.getSensitivity());
-        popDialog.setIcon(android.R.drawable.ic_menu_manage);
-        popDialog.setTitle("Ajuste de Sensibilidad");
-        popDialog.setView(seek);
-
-        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-                settingsSource.setSensitivity(progress);
-            }
-            public void onStartTrackingTouch(SeekBar arg0) {}
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
-        popDialog.setPositiveButton("Listo",new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        popDialog.create();
-        popDialog.show();
-    }
-
-    /*public float mapSensitivity(int progress){
-        if(progress < 50){}
-        else {}
-    }*/
 
     public static class PlaceholderFragment extends Fragment {
         private static final String ARG_SECTION_NUMBER = "section_number";

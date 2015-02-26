@@ -18,9 +18,9 @@ function Interfaz (camera,scene) {
 		controls.setWeapon(w);
 	}
 	
-	this.update = function(){
+	this.update = function(dt){
 		controls.isOnObject(false);
-		controls.update();
+		controls.update(dt);
 	}
 	
 	this.getControls = function(){

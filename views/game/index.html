@@ -13,27 +13,58 @@
 		<script src="js/machine.js"></script>
 	</head>
 	<body>
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/es_LA/sdk.js#xfbml=1&appId=1392991770997697&version=v2.0";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
 		<section>
-			<article>
-				<span>La Conquista de los Paltas</span>
-				<p id="target" style="font-style:italic;"></p>
-				<script>
-					$('#target').teletype({
-						text: [ 'En el año de 1450, los Incas emprenden su campaña para la conquista del norte andino. Estos, luego de sucesivas victorias se interesaron por conquistar la provincia de cañari. En el camino sometieron a los Paltas, quienes eran indios muy feroces que cultivaban en su territorio frutos muy apreciados que llevaban su nombre. Además, se deformaban la cabeza...'] 
-					});
-				</script>
-				<p style="font-size:30px;font-weight:bold;">Activa para jugar<br><small style="font-size:20px;">(Mueve el switch de tu dispositivo)</small></p>
+			<article id="start">
+				<div class="content">
+					<span>La Conquista de los Paltas</span>
+					<p id="target"></p>
+						<script>
+							$('#target').teletype({
+								text: [ 'En el año de 1450, los Incas emprenden su campaña para la conquista del norte andino. Estos, luego de sucesivas victorias se interesaron por conquistar la provincia de cañari. En el camino sometieron a los Paltas, quienes eran indios muy feroces que cultivaban en su territorio frutos muy apreciados que llevaban su nombre. Además, se deformaban la cabeza...'] 
+							});
+						</script>
+					<p id="activar">Activa para jugar<br><small style="font-size:20px;">(Mueve el switch de tu dispositivo)</small></p>
+				</div>
+				<div class="img"></div>
 			</article>
+			<article id="win">
+				<div class="content">
+					<span>¡Victoria!</span>
+					<p id="target">Ahora los Paltas están bajo tu control. Fue una tarea dura, pero ellos no serán más una amenaza para tu pueblo. Tu aventura recién comienza.</p>
+					<p style="font-weight:bold;">Más niveles próximamente.</p>
+					<div class="fb-share-button" data-href="http://www.ingesoli.com:8080/amig8" data-layout="button_count"></div><br>
+					<a id="volver" href="/">Volver al inicio</a>
+				</div>
+				<div class="img"></div>
+			</article>
+			<article id="lose">
+				<div class="content">
+					<span>¡Oh no!</span>	
+					<p id="target">Tus tropas han sido derrotadas, y todo ha llegado a su fin.</p>
+					<div class="fb-share-button" data-href="http://www.ingesoli.com:8080/amig8" data-layout="button_count"></div><br>
+					<a id="volver" href="/">Volver al inicio</a>
+				</div>
+				<div class="img"></div>
+			</article>
+			<article id="damage"></article>
 			<audio id="mediaInit" autoplay loop>
-				<source src="audio/mediainit.mp3" type="audio/mpeg">
+				<source src="audio/mediainit.wav" type="audio/mpeg">
 			</audio>
 			<audio id="mediaContinue" loop>
-				<source src="audio/mediacontinue.mp3" type="audio/mpeg">
+				<source src="audio/mediacontinue.wav" type="audio/mpeg">
 			</audio>
 		</section>
 		<aside>
-			<div><span id="allies">20 aliados</span></div>
-			<div><span id="enemies">20 enemigos</span></div>
+			<div><span id="allies">2 Incas</span></div>
+			<div><span id="enemies">2 Paltas</span></div>
 		</aside>
 		<footer>
 			<div id="live">100%</div>
@@ -53,8 +84,11 @@
 		<script src="js/BodyMatico.js"></script>
 		<script src="js/Weapon.js"></script>
 		<script src="js/Actor.js"></script>
-		<script src="js/Init.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="js/socketHandler.js"></script>
+		<script src="js/Init.js"></script>
+		<script>
+			setTimeout(function() { $('#activar').attr("class","animate"); }, 35000);
+		</script>
 	</body>
 </html>

@@ -1,4 +1,6 @@
 function ambienteMatico(_scene){
+	self=this;
+	this.skybox=null;
 	var scene = _scene,
 		HeightData = null,
 		maxHeight  = null,
@@ -6,7 +8,6 @@ function ambienteMatico(_scene){
 		marUrl        = null,
 		plane          = null,
 		planeFisico = null,
-		skybox        = null,
 		img             = null,
 		altura          = -100,
 		nivelMar      = 50,
@@ -81,8 +82,8 @@ function ambienteMatico(_scene){
 			materialArray[i].side = THREE.BackSide;
 		}
 		var skyboxGeom = new THREE.BoxGeometry( max, max, max, 1, 1, 1);
-		skybox = new THREE.Mesh( skyboxGeom, new THREE.MeshFaceMaterial(materialArray));
-		scene.add(skybox);
+		self.skybox = new THREE.Mesh( skyboxGeom, new THREE.MeshFaceMaterial(materialArray));
+		scene.add(self.skybox);
 	}
 
 	this.generate = function(){
@@ -234,21 +235,22 @@ function ambienteMatico(_scene){
 		return v;
 	}
 	
-	var getYat=function(v){
-		var y=v.y;
-			raycaster.set(v, new THREE.Vector3(0,-1,0));
-		 	intersects = raycaster.intersectObject(planeFisico);
+	var getYat = function(v){
+		var y = v.y;
+		raycaster.set(v, new THREE.Vector3(0,-1,0));
+		intersects = raycaster.intersectObject(planeFisico);
+		if(intersects.length != 0){
+			y = intersects[0].point.y;
+		}else{
+			raycaster.set(v, new THREE.Vector3(0,1,0));
+			intersects = raycaster.intersectObject(planeFisico);
 			if(intersects.length!=0){
-				y=intersects[0].point.y;
-			}else{
-				raycaster.set(v, new THREE.Vector3(0,1,0));
-				intersects = raycaster.intersectObject(planeFisico);
-				if(intersects.length!=0){
-				y=intersects[0].point.y;
-				}
+				y = intersects[0].point.y;
 			}
-			return y;
+		}
+		return y;
 	}
+	
 	var getYatOld = function(v){
 		var init = realPositionAt(0);
 		var vectors = [];
